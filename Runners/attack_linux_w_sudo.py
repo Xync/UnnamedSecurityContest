@@ -16,7 +16,7 @@ except:
     print ("error setting policy")
 
 try:
-    client.connect(hostname=sys.argv[1], username=sys.argv[2], password=sys.argv[3])
+    client.connect(hostname=sys.argv[1], username=sys.argv[2], password=sys.argv[3], timeout=10)
 except:
     print ("Error in connection")
 
@@ -41,7 +41,7 @@ a64blob = b64_bytes.decode("ascii")
 
 ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('/bin/bash')
 ssh_stdin.write('unset HISTFILE\n')
-ssh_stdin.write('/usr/bin/sudo su -\n')
+ssh_stdin.write('/usr/bin/sudo -S su -\n')
 time.sleep(1)
 ssh_stdin.write(sys.argv[4]+'\n')
 ssh_stdin.write('echo '+a64blob+'| base64 -d > /tmp/remote.tgz\n')
