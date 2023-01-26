@@ -86,7 +86,7 @@ resource "aws_instance" "OpenVPN" {
   associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_openvpn.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Ubuntu 20.04 LTS
@@ -98,7 +98,7 @@ resource "aws_instance" "Ubuntu20" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_ubuntu.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Ubuntu 18.04 LTS
@@ -110,7 +110,7 @@ resource "aws_instance" "Ubuntu18" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_ubuntu.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Ubuntu 16.04 LTS
@@ -122,7 +122,7 @@ resource "aws_instance" "Ubuntu16" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_ubuntu.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Debian 11
@@ -134,7 +134,7 @@ resource "aws_instance" "Debian11" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_ubuntu.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Debian 9 - Stretch
@@ -146,7 +146,7 @@ resource "aws_instance" "Debian9" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_ubuntu.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Centos 8 - Stream
@@ -158,7 +158,7 @@ resource "aws_instance" "Centos8" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_fedora.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Fedora 32
@@ -170,7 +170,7 @@ resource "aws_instance" "Fedora32" {
   associate_public_ip_address = false
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_fedora.sh")}"
+  user_data = "${file("bootstrap_linux.sh")}"
 }
 
 output "OpenVPN_IP" {
