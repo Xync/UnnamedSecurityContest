@@ -86,7 +86,21 @@ resource "aws_instance" "OpenVPN" {
   associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"
-  user_data = "${file("bootstrap_linux.sh")}"
+  user_data = "${file("bootstrap_openvpn.sh")}"
+}
+
+# Kali "Attack" Pod
+# To test pod setup scripts.  Attack scripts can be run directly from your host machine.
+resource "aws_instance" "Kali" {
+  # Kali's official AMI
+  ami           = "ami-07a53017d32cd4da0"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.100"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  #user_data = "${file("bootstrap_linux.sh")}"
 }
 
 # Ubuntu 20.04 LTS
@@ -100,7 +114,7 @@ resource "aws_instance" "Ubuntu20" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
+/*
 # Ubuntu 18.04 LTS
 resource "aws_instance" "Ubuntu18" {
   ami           = "ami-0135afc6d226a70a4"
@@ -172,6 +186,7 @@ resource "aws_instance" "Fedora32" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
+*/
 
 output "OpenVPN_IP" {
     value = aws_instance.OpenVPN.public_ip

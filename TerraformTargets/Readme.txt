@@ -59,6 +59,7 @@ Import the config into OpenVPN and connect
 
 In a full build the servers will be as follows
 OpenVPN - 10.23.0.5
+Kali - 10.23.0.100
 Centos 8 Stream - 10.23.0.8
 Debian 9 - 10.23.0.9
 Debian 11 - 10.23.0.11
