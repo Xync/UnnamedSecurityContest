@@ -114,7 +114,7 @@ resource "aws_instance" "Ubuntu20" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-/*
+
 # Ubuntu 18.04 LTS
 resource "aws_instance" "Ubuntu18" {
   ami           = "ami-0135afc6d226a70a4"
@@ -186,7 +186,6 @@ resource "aws_instance" "Fedora32" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-*/
 
 output "OpenVPN_IP" {
     value = aws_instance.OpenVPN.public_ip
