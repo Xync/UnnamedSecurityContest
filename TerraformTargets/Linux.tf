@@ -13,15 +13,25 @@ provider "aws" {
   region     = "us-west-2"
 }
 
-# A VPC to contain the servers.
+# A VPC to contain the servers and gateways
 resource "aws_vpc" "ccdc_vpc" {
-  cidr_block = "10.23.0.0/24"
+  cidr_block = "10.23.0.0/16"
   tags = {
     Name = "CCDCVPC"
   }
 }
 
-# Subnet required for VPC
+# Subnet for the gateways (public)
+resource "aws_subnet" "ccdc_gw_subnet" {
+  vpc_id = "${aws_vpc.ccdc_vpc.id}"
+  cidr_block = "10.23.1.0/24"
+  availability_zone = "us-west-2c"
+  tags = {
+    Name = "ccdcSubnet"
+  }
+}
+
+# Subnet for the servers
 resource "aws_subnet" "ccdc_subnet" {
   vpc_id = "${aws_vpc.ccdc_vpc.id}"
   cidr_block = "10.23.0.0/24"
@@ -39,11 +49,50 @@ resource "aws_internet_gateway" "ccdc_gw" {
   }
 }
 
-# Route to send VPC member's Internet traffic through the gateway
-resource "aws_route" "outbound_inet_route" {
+# Elastic IP for the NAT gateway
+resource "aws_eip" "ccdc_nat_eip" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "ccdc_nat_gw" {
+  allocation_id = "${aws_eip.ccdc_nat_eip.id}"
+  subnet_id = "${aws_subnet.ccdc_gw_subnet.id}"
+  tags = {
+    Name = "CCDC NAT Gateway"
+  }
+}
+
+resource "aws_route_table" "nat_to_gw_route" {
+  vpc_id = "${aws_vpc.ccdc_vpc.id}"
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.ccdc_gw.id
+  }
+}
+
+resource "aws_route_table_association" "nat_route_assoc" {
+  subnet_id = "${aws_subnet.ccdc_gw_subnet.id}"
+  route_table_id = aws_route_table.nat_to_gw_route.id
+}
+
+# Route to send VPC member's Internet traffic through the NAT gateway
+/*resource "aws_route" "outbound_inet_route" {
   route_table_id = "${aws_vpc.ccdc_vpc.main_route_table_id}"
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id = "${aws_internet_gateway.ccdc_gw.id}"
+  gateway_id = "${aws_nat_gateway.ccdc_nat_gw.id}"
+  #gateway_id = "${aws_internet_gateway.ccdc_gw.id}"
+}*/
+resource "aws_route_table" "servers_to_nat_route" {
+  vpc_id = "${aws_vpc.ccdc_vpc.id}"
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.ccdc_nat_gw.id
+  }
+}
+
+resource "aws_route_table_association" "server_route_assoc" {
+  subnet_id = "${aws_subnet.ccdc_subnet.id}"
+  route_table_id = aws_route_table.servers_to_nat_route.id
 }
 
 # Security Group to allow:
@@ -81,8 +130,8 @@ resource "aws_instance" "OpenVPN" {
   # Ubuntu 22.04 LTS
   ami           = "ami-03f8756d29f0b5f21"
   instance_type = "t2.micro"
-  subnet_id= aws_subnet.ccdc_subnet.id
-  private_ip = "10.23.0.5"
+  subnet_id= aws_subnet.ccdc_gw_subnet.id
+  private_ip = "10.23.1.5"
   associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
   key_name="CCDCTest"

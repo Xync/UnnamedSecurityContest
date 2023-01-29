@@ -37,11 +37,12 @@ If you want, you could take these bootstrap files to your own VMs
 Run once in the project directory
 terraform init 
 
-Before you can build the CentOS and Fedora servers you have to agree to a license.
+Before you can build the CentOS, Fedora, or Kali servers you have to agree to a license.
 The page is for AMIs with license charges, but there are none.  Only normal hardware costs.
 Visit this URL while logged in to the console.
 https://aws.amazon.com/marketplace/pp?sku=633jhlnyl61qp9ukyefuy0a07
 https://aws.amazon.com/marketplace/pp?sku=9svc856m58q4n42iz9he7imlb
+https://aws.amazon.com/marketplace/pp?sku=7lgvy7mt78lgoi4lant0znp5h
 
 ** Build the environment.
 terraform apply
