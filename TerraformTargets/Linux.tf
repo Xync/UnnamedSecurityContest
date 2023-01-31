@@ -152,6 +152,83 @@ resource "aws_instance" "Kali" {
   #user_data = "${file("bootstrap_linux.sh")}"
 }
 
+# Ubuntu 12.04 LTS
+resource "aws_instance" "Ubuntu12" {
+  ami           = "ami-830c94e3"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.12"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+# Ubuntu 14.04 LTS
+resource "aws_instance" "Ubuntu14" {
+  ami           = "ami-02ced4f4da4322f56"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.14"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+# Debian 8.5
+resource "aws_instance" "Deb8" {
+  ami           = "ami-094b27f54904c24ce"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.8"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+# CentOS 7
+resource "aws_instance" "CentOS7" {
+  ami           = "ami-08c191625cfb7ee61"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.7"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+/*
+# CAN'T FIND A FEDORA 21 AMI!
+# Fedora 21
+resource "aws_instance" "Fedora21" {
+  # This is actually a docker test build but should work
+  ami           = "ami-f7256fc7"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.21"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+*/
+
+# Fedora 32
+resource "aws_instance" "Fedora32" {
+  ami           = "ami-04e340b8978593202"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.32"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+/* Newer boxes not expected to be part of the environment
 # Ubuntu 20.04 LTS
 resource "aws_instance" "Ubuntu20" {
    ami           = "ami-0d31d7c9fc9503726"
@@ -223,18 +300,7 @@ resource "aws_instance" "Centos8" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
-# Fedora 32
-resource "aws_instance" "Fedora32" {
-  ami           = "ami-04e340b8978593202"
-  instance_type = "t2.micro"
-  subnet_id= aws_subnet.ccdc_subnet.id
-  private_ip = "10.23.0.32"
-  associate_public_ip_address = false
-  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
-  key_name="CCDCTest"
-  user_data = "${file("bootstrap_linux.sh")}"
-}
+*/
 
 output "OpenVPN_IP" {
     value = aws_instance.OpenVPN.public_ip

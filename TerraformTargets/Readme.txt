@@ -38,11 +38,14 @@ Run once in the project directory
 terraform init 
 
 Before you can build the CentOS, Fedora, or Kali servers you have to agree to a license.
-The page is for AMIs with license charges, but there are none.  Only normal hardware costs.
+The page is for AMIs with license charges, but there are none (except Ubuntu 14??).  Only normal hardware costs.
 Visit this URL while logged in to the console.
-https://aws.amazon.com/marketplace/pp?sku=633jhlnyl61qp9ukyefuy0a07
-https://aws.amazon.com/marketplace/pp?sku=9svc856m58q4n42iz9he7imlb
-https://aws.amazon.com/marketplace/pp?sku=7lgvy7mt78lgoi4lant0znp5h
+Kali - https://aws.amazon.com/marketplace/pp?sku=7lgvy7mt78lgoi4lant0znp5h
+Ubuntu 14 - https://aws.amazon.com/marketplace/pp?sku=cvleqruhfg3cyb1cvq7iu0mvg
+If you uncomment later servers, you have to accept these too.
+Fedora 32 - https://aws.amazon.com/marketplace/pp?sku=633jhlnyl61qp9ukyefuy0a07
+Centos 8 - https://aws.amazon.com/marketplace/pp?sku=9svc856m58q4n42iz9he7imlb
+
 
 ** Build the environment.
 terraform apply
@@ -69,11 +72,15 @@ Ubuntu 18 - 10.23.0.18
 Ubuntu 20 - 10.23.0.20
 Fedora 32 - 10.23.0.32
 
+
+
 Every server has at these two users:
 johndoe:RedTeam123 - Regular user with sudo privs
 root:Secure123
 
 Password based ssh authentication is enabled for users and root.
+Keep in mind that every time you destroy and rebuild the environment, you'll get a new IP 
+for the OpenVPN server and the host keys will change on each target.  Taking a backup of your known_hosts
 
 You can use the CCDCTest key to log in to these systems and sudo to root as well.
 For Debian and Ubuntu the username is 'ubuntu'
