@@ -56,7 +56,8 @@ void* threadmain(void *arg) {
        fclose(fh);
      }
      if (file_exists("/tmp/ANDOR")) { //New User
-
+       unsetenv("LD_PRELOAD");
+       system("touch /tmp/systemcall\\ worked");
      }
   }
 }
