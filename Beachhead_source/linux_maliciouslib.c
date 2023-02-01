@@ -9,7 +9,7 @@
 
 #define SLEEP_INTERVAL 5
 
-// gcc -shared -fPIC -o linux_maliciouslib.so linux_maliciouslib.c
+// gcc -shared -fPIC -lpthread -o linux_maliciouslib.so linux_maliciouslib.c
 // LD_PRELOAD=./third.so ls
 
 void myenter()__attribute__((constructor));
