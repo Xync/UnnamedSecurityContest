@@ -42,6 +42,7 @@ The page is for AMIs with license charges, but there are none (except Ubuntu 14?
 Visit this URL while logged in to the console.
 Kali - https://aws.amazon.com/marketplace/pp?sku=7lgvy7mt78lgoi4lant0znp5h
 Ubuntu 14 - https://aws.amazon.com/marketplace/pp?sku=cvleqruhfg3cyb1cvq7iu0mvg
+Centos 7 - https://aws.amazon.com/marketplace/pp?sku=cvugziknvmxgqna9noibqnnsy
 If you uncomment later servers, you have to accept these too.
 Fedora 32 - https://aws.amazon.com/marketplace/pp?sku=633jhlnyl61qp9ukyefuy0a07
 Centos 8 - https://aws.amazon.com/marketplace/pp?sku=9svc856m58q4n42iz9he7imlb
@@ -64,26 +65,37 @@ Import the config into OpenVPN and connect
 In a full build the servers will be as follows
 OpenVPN - 10.23.0.5
 Kali - 10.23.0.100
-Centos 8 Stream - 10.23.0.8
-Debian 9 - 10.23.0.9
-Debian 11 - 10.23.0.11
-Ubuntu 16 - 10.23.0.16
-Ubuntu 18 - 10.23.0.18
-Ubuntu 20 - 10.23.0.20
+Centos 7 Stream - 10.23.0.7
+(inactive) Centos 8 Stream - 10.23.0.8
+Debian 8 - 10.23.0.8
+(inactive) Debian 9 - 10.23.0.9
+(inactive) Debian 11 - 10.23.0.11
+Ubuntu 12 - 10.23.0.12
+Ubuntu 14 - 10.23.0.14
+(inactive) Ubuntu 16 - 10.23.0.16
+(inactive) Ubuntu 18 - 10.23.0.18
+(inactive) Ubuntu 20 - 10.23.0.20
+Windows 2012 PDC - 10.23.0.30
+Windows 2016 Domain Member - 10.23.0.31
 Fedora 32 - 10.23.0.32
 
 
-
-Every server has at these two users:
+Every Linux server has at these two users:
 johndoe:RedTeam123 - Regular user with sudo privs
 root:Secure123
+
+Windows Local Admin password is displayed on build.
+Domain Users:
+WB\DomAdmin:DAPassword1!
+WB\User1:Password1!
 
 Password based ssh authentication is enabled for users and root.
 Keep in mind that every time you destroy and rebuild the environment, you'll get a new IP 
 for the OpenVPN server and the host keys will change on each target.  Taking a backup of your known_hosts
 
 You can use the CCDCTest key to log in to these systems and sudo to root as well.
-For Debian and Ubuntu the username is 'ubuntu'
+For Debian the username is 'debian'
+For Ubuntu the username is 'ubuntu'
 For Fedora the username is 'fedora'
 For Centos the username is 'centos'
 e.g. ssh -i CCDCTest.pem fedora@10.23.0.32

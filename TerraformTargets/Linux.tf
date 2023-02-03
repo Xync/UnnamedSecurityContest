@@ -151,7 +151,7 @@ resource "aws_instance" "Kali" {
   key_name="CCDCTest"
   #user_data = "${file("bootstrap_linux.sh")}"
 }
-
+/*
 # Ubuntu 12.04 LTS
 resource "aws_instance" "Ubuntu12" {
   ami           = "ami-830c94e3"
@@ -163,7 +163,7 @@ resource "aws_instance" "Ubuntu12" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
+*/
 # Ubuntu 14.04 LTS
 resource "aws_instance" "Ubuntu14" {
   ami           = "ami-02ced4f4da4322f56"
@@ -175,7 +175,7 @@ resource "aws_instance" "Ubuntu14" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
+/*
 # Debian 8.5
 resource "aws_instance" "Deb8" {
   ami           = "ami-094b27f54904c24ce"
@@ -199,7 +199,7 @@ resource "aws_instance" "CentOS7" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
+*/
 /*
 # CAN'T FIND A FEDORA 21 AMI!
 # Fedora 21
@@ -215,7 +215,7 @@ resource "aws_instance" "Fedora21" {
   user_data = "${file("bootstrap_linux.sh")}"
 }
 */
-
+/*
 # Fedora 32
 resource "aws_instance" "Fedora32" {
   ami           = "ami-04e340b8978593202"
@@ -227,7 +227,7 @@ resource "aws_instance" "Fedora32" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-
+*/
 /* Newer boxes not expected to be part of the environment
 # Ubuntu 20.04 LTS
 resource "aws_instance" "Ubuntu20" {
@@ -302,10 +302,143 @@ resource "aws_instance" "Centos8" {
 }
 */
 
+# Couldn't figure out how to get the AWS generated Admin pass
+# Since self references were forbidden.  So I'll create a new one
+resource "random_string" "admin_pass" {
+  length = 10
+}
+
+# Define the Primary Domain Controller
+resource "aws_instance" "pdc" {
+  # Base Win2012 Image
+  ami           = "ami-037a58d5f7db56631"
+  # A t2.micro takes ~20 minutes for the domain to be available
+  # A t2.micro takes ~15 minutes for the domain to be available
+  # A t2.medium takes ~10 minutes for the domain to be available
+  instance_type = "t2.small"
+  subnet_id= "${aws_subnet.ccdc_subnet.id}"
+  private_ip = "10.23.0.30"
+  associate_public_ip_address = false
+  security_groups = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  #get_password_data = true
+  # This script will be executed once the instance is available
+  # In this case, configure the system as a domain controller
+  # Since this can't be done without a reboot in the middle
+  # Set up a scheduled task to complete the configuration
+  user_data = <<-EOF
+    <powershell>
+    #echo "User Data Started" | Out-File -filepath C:\Users\Administrator\log.txt
+    # Install Active Directory Powershell Tools
+    Add-windowsfeature AD-Domain-Services -IncludeManagementTools
+    # Create User Creation Script (Step 2)
+echo @'
+  #echo adduser_started | Out-File -filepath C:\Users\Administrator\log.txt -append
+  New-ADUser -SamAccountName DomAdmin -Name "Domain Admin" -UserPrincipalName domadmin@wb.local -AccountPassword (ConvertTo-SecureString -asplaintext "DAPassword1!" -force) -Enabled $true -PasswordNeverExpires $true -Path "CN=Users,DC=wb,DC=local"
+  Add-ADGroupMember -Identity "Domain Admins" -Members DomAdmin
+  Add-ADGroupMember -Identity "Remote " -Members DomAdmin
+  New-ADUser -SamAccountName User1 -Name "User One" -UserPrincipalName user1@wb.local -AccountPassword (ConvertTo-SecureString -asplaintext "Password1!" -force) -Enabled $true -Path "CN=Users,DC=wb,DC=local"
+  Rename-Computer -NewName "PDC"
+  # Delete the scheduled task and undo auto-login
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name AutoAdminLogon -Force | Out-Null
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name DefaultUserName -Force | Out-Null
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon"  -Name DefaultPassword -Force | Out-Null
+  SCHTASKS.EXE /DELETE /F /TN "Step2"
+  del C:\Users\Administrator\addusers.ps1
+  echo "Calling Reboot 2" | Out-File -filepath C:\Users\Administrator\log.txt -append
+  Restart-Computer -Force
+'@ | Out-File -filepath C:\Users\Administrator\addusers.ps1
+
+    # Set the admin pass to our random string
+    $user = [adsi]"WinNT://localhost/Administrator,user"
+    $user.SetPassword("${random_string.admin_pass.result}")
+    $user.SetInfo()
+
+    # Set the system to automatically log in and create a schedule task for step 2
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name AutoAdminLogon -PropertyType DWORD -Value 1 -Force | Out-Null
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name DefaultUserName -PropertyType String -Value Administrator -Force | Out-Null
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon"  -Name DefaultPassword -PropertyType String -Value "${random_string.admin_pass.result}" -Force | Out-Null
+    SCHTASKS.EXE /CREATE /F /SC ONLOGON /DELAY 0001:00 /TN "Step2" /RL HIGHEST /TR "Powershell.exe -ExecutionPolicy Bypass -File C:\Users\Administrator\addusers.ps1"
+
+    # Actually do the domain promotion.  This will cause a reboot automatically
+    install-addsforest -domainname wb.local -DomainNetBIOSName "WB" -Force -safemodeadministratorpassword (convertto-securestring "SafePass1!" -asplaintext -force)
+    </powershell>
+    EOF
+}
+
+# Define Domain Member 1 (Win2016 Server)
+resource "aws_instance" "Win2016" {
+  ami           = "ami-005b3f1e9bd7a715a"
+  instance_type = "t2.micro"
+  subnet_id= "${aws_subnet.ccdc_subnet.id}"
+  private_ip = "10.23.0.31"
+  associate_public_ip_address = false
+  security_groups = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  get_password_data = true
+  # This script will be executed once the instance is available
+  # In this case, configure the system as a domain controller
+  # Since this can't be done without a reboot in the middle
+  # Set up a scheduled task to complete the configuration
+  user_data = <<-EOF
+    <powershell>
+    # Create Join Domain Script (Step 2)
+echo @'
+  # Delete the scheduled task and undo auto-login
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name AutoAdminLogon -Force | Out-Null
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name DefaultUserName -Force | Out-Null
+  Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon"  -Name DefaultPassword -Force | Out-Null
+  SCHTASKS.EXE /DELETE /F /TN "Step2"
+  del C:\Step2.ps1
+  # Wait for the PDC to respond to the DNS lookup
+  do {
+    sleep 15
+    $date = Get-Date
+    echo "Checking for lookup at $date"
+    ipconfig /flushdns
+    $res = ping pdc.wb.local
+  } until ($?)
+  netdom JOIN $env:computername /Domain:wb.local /UserD:WB\domadmin /PasswordD:DAPassword1! /reboot > C:\result.txt
+'@ | Out-File -filepath C:\Step2.ps1
+    # Simplify the file path above because 2003 doesn't have a Users directory
+
+    # Set the admin pass to our random string
+    $user = [adsi]"WinNT://localhost/Administrator,user"
+    $user.SetPassword("${random_string.admin_pass.result}")
+    $user.SetInfo()
+
+    # Set the system to automatically log in and create a schedule task for step 2
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name AutoAdminLogon -PropertyType DWORD -Value 1 -Force | Out-Null
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon" -Name DefaultUserName -PropertyType String -Value Administrator -Force | Out-Null
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\winlogon"  -Name DefaultPassword -PropertyType String -Value "${random_string.admin_pass.result}" -Force | Out-Null
+    SCHTASKS.EXE /CREATE /F /SC ONLOGON /DELAY 0001:00 /TN "Step2" /RL HIGHEST /TR "Powershell.exe -ExecutionPolicy Bypass -File C:\Step2.ps1"
+
+    # Point the DNS to the PDC or domain join won't work
+    # Win2008 version
+    #netsh interface ip set dns "Local Area Connection" static 10.23.0.30
+    # Powershell 3 version (probably don't need both but it works)
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("10.23.0.30")
+    # Rename the computer
+    Rename-Computer -NewName Server1
+    # Reboot to take effect and trigger step 2
+    Restart-Computer -Force
+    </powershell>
+    EOF
+}
+
+
+output "PDC_Info" {
+  value = "PDC Password: ${random_string.admin_pass.result}\n"
+}
+
 output "OpenVPN_IP" {
     value = aws_instance.OpenVPN.public_ip
 }
 
 output "Config_Command" {
   value = format("scp -i CCDCTest.pem ubuntu@%s:/home/ubuntu/openvpn-config/attacker.ovpn .", aws_instance.OpenVPN.public_ip)
+}
+
+output "Windows Timing" {
+  value = "The Windows Domain Members will not join the domain for up to 20 minutes because the PDC takes that long to complete configuration."
 }
