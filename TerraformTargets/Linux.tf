@@ -138,6 +138,7 @@ resource "aws_instance" "OpenVPN" {
   user_data = "${file("bootstrap_openvpn.sh")}"
 }
 
+/*
 # Kali "Attack" Pod
 # To test pod setup scripts.  Attack scripts can be run directly from your host machine.
 resource "aws_instance" "Kali" {
@@ -151,7 +152,7 @@ resource "aws_instance" "Kali" {
   key_name="CCDCTest"
   #user_data = "${file("bootstrap_linux.sh")}"
 }
-/*
+*/
 # Ubuntu 12.04 LTS
 resource "aws_instance" "Ubuntu12" {
   ami           = "ami-830c94e3"
@@ -163,7 +164,7 @@ resource "aws_instance" "Ubuntu12" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-*/
+
 # Ubuntu 14.04 LTS
 resource "aws_instance" "Ubuntu14" {
   ami           = "ami-02ced4f4da4322f56"
@@ -175,7 +176,7 @@ resource "aws_instance" "Ubuntu14" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-/*
+
 # Debian 8.5
 resource "aws_instance" "Deb8" {
   ami           = "ami-094b27f54904c24ce"
@@ -199,7 +200,20 @@ resource "aws_instance" "CentOS7" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-*/
+
+# Fedora 32
+resource "aws_instance" "Fedora32" {
+  ami           = "ami-04e340b8978593202"
+  instance_type = "t2.micro"
+  subnet_id= aws_subnet.ccdc_subnet.id
+  private_ip = "10.23.0.32"
+  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
+  key_name="CCDCTest"
+  user_data = "${file("bootstrap_linux.sh")}"
+}
+
+
 /*
 # CAN'T FIND A FEDORA 21 AMI!
 # Fedora 21
@@ -215,19 +229,7 @@ resource "aws_instance" "Fedora21" {
   user_data = "${file("bootstrap_linux.sh")}"
 }
 */
-/*
-# Fedora 32
-resource "aws_instance" "Fedora32" {
-  ami           = "ami-04e340b8978593202"
-  instance_type = "t2.micro"
-  subnet_id= aws_subnet.ccdc_subnet.id
-  private_ip = "10.23.0.32"
-  associate_public_ip_address = false
-  vpc_security_group_ids = [aws_security_group.CCDC_sg.id]
-  key_name="CCDCTest"
-  user_data = "${file("bootstrap_linux.sh")}"
-}
-*/
+
 /* Newer boxes not expected to be part of the environment
 # Ubuntu 20.04 LTS
 resource "aws_instance" "Ubuntu20" {
@@ -308,6 +310,7 @@ resource "random_string" "admin_pass" {
   length = 10
 }
 
+/*
 # Define the Primary Domain Controller
 resource "aws_instance" "pdc" {
   # Base Win2012 Image
@@ -425,7 +428,7 @@ echo @'
     </powershell>
     EOF
 }
-
+*/
 
 output "PDC_Info" {
   value = "PDC Password: ${random_string.admin_pass.result}\n"
@@ -439,6 +442,6 @@ output "Config_Command" {
   value = format("scp -i CCDCTest.pem ubuntu@%s:/home/ubuntu/openvpn-config/attacker.ovpn .", aws_instance.OpenVPN.public_ip)
 }
 
-output "Windows Timing" {
-  value = "The Windows Domain Members will not join the domain for up to 20 minutes because the PDC takes that long to complete configuration."
+output "Windows_Timing" {
+  value = "The Windows Domain Members will not join the domain for up to 20 minutes because the PDC takes that long to complete configuration.  Windows systems are commented out by default."
 }
