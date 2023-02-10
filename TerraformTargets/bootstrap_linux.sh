@@ -22,9 +22,9 @@ sed -i 's/^#PermitRootLogin .*$/PermitRootLogin yes/' /etc/ssh/sshd_config
 # Fedora allows password auth by default, CentOS doesn't
 sed -i 's/^PasswordAuthentication .*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-if [ -f "/usr/bin/systemctl" ]; then
+# Ubuntu 12 & 14 don't use systemd,
+if which systemctl; then
     systemctl restart sshd
 else
-    # for ubuntu 12 & 14
     service ssh restart
 fi

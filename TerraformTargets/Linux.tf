@@ -213,7 +213,6 @@ resource "aws_instance" "Fedora32" {
   user_data = "${file("bootstrap_linux.sh")}"
 }
 
-
 /*
 # CAN'T FIND A FEDORA 21 AMI!
 # Fedora 21

@@ -1,8 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-/usr/bin/touch /tmp/start
-./adduser.sh
-./aptAPT.sh
-./PAMswap.sh
-./phonehome.sh
-/usr/bin/touch /tmp/end
+cd /tmp/remote
+/tmp/remote/adduser.sh
+/tmp/remote/sshKeys.sh
+/tmp/remote/rude_suid.sh
