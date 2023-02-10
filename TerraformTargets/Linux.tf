@@ -138,7 +138,7 @@ resource "aws_instance" "OpenVPN" {
   user_data = "${file("bootstrap_openvpn.sh")}"
 }
 
-
+/*
 # Kali "Attack" Pod
 # To test pod setup scripts.  Attack scripts can be run directly from your host machine.
 resource "aws_instance" "Kali" {
@@ -152,7 +152,7 @@ resource "aws_instance" "Kali" {
   key_name="CCDCTest"
   #user_data = "${file("bootstrap_linux.sh")}"
 }
-
+*/
 # Ubuntu 12.04 LTS
 resource "aws_instance" "Ubuntu12" {
   ami           = "ami-830c94e3"
@@ -164,7 +164,7 @@ resource "aws_instance" "Ubuntu12" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-/*
+
 # Ubuntu 14.04 LTS
 resource "aws_instance" "Ubuntu14" {
   ami           = "ami-02ced4f4da4322f56"
@@ -212,7 +212,6 @@ resource "aws_instance" "Fedora32" {
   key_name="CCDCTest"
   user_data = "${file("bootstrap_linux.sh")}"
 }
-*/
 
 /*
 # CAN'T FIND A FEDORA 21 AMI!
