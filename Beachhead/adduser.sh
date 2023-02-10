@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Create a new user named scoring.  Create them as a system user (lower user id)
 useradd -m -s /bin/bash scoring
