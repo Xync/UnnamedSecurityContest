@@ -13,7 +13,7 @@ int check_temp_tasks()
   char torequest[900];
   char path[1024];
   int port;
-  struct sockaddr_in servaddr;
+//  struct sockaddr_in servaddr;
 
   // file_exists needs to be arch independent
   // unlinking needs to be arch independent

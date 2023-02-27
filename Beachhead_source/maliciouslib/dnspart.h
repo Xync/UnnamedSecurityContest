@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 
 
@@ -7,7 +6,15 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <resolv.h>
+#include <unistd.h>
 #endif
+
+#ifdef WINDOWS_VERSION
+#include <Windows.h>
+#include <windns.h>
+#pragma comment(lib, "Dnsapi.lib") // link against the Dnsapi library
+#endif
+
 
 extern char* ME;
 

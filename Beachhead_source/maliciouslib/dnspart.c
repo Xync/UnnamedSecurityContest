@@ -1,5 +1,12 @@
 #include "dnspart.h"
 
+
+//Resolve-DnsName villagevines.com -Type TXT
+//Should I just do it with command prompt?
+// IP isn't necessary on next for win 11.  Not sure about older.
+//nslookup -type=TXT villagevines.com 8.8.8.8
+//nslookup -q=TXT director.multifariousnonsense.com
+
 void check_dns_tasks()
 {
     // encode myhostname
@@ -16,6 +23,7 @@ void dnslog(int status)
 {
 }
 
+#ifdef DEACTIVATED
 // Not sure what the return should be?
 void olddnstxtrequest(char *tofetch)
 {
@@ -70,9 +78,37 @@ void olddnstxtrequest(char *tofetch)
     freeaddrinfo(result); /* Free the memory allocated by getaddrinfo() */
     return;
 }
+#endif
 
 void dnstxtrequest(char *pszDomain)
 {
+
+#ifdef WINDOWS_VERSION
+#endif
+
+    DNS_RECORD *dns_records;
+    DNS_STATUS status = DnsQuery_A(pszDomain, DNS_TYPE_TEXT, DNS_QUERY_STANDARD, NULL, &dns_records, NULL);
+    //if (status != DNS_RCODE_NOERROR) {
+    if (status != 0) {  //Guess at no error since I don't know that constant... in some windns (but not mingw apparently)
+        fprintf(stderr, "Error: %d\n", status);
+        return;
+    }
+
+    printf("TXT records for %s:\n", pszDomain);
+    DNS_RECORD *txt_record = dns_records;
+    while (txt_record != NULL) {
+        if (txt_record->wType == DNS_TYPE_TEXT) {
+            printf("%s\n", txt_record->Data.TXT.pStringArray[0]);
+        }
+        txt_record = txt_record->pNext;
+    }
+
+    DnsRecordListFree(dns_records, DnsFreeRecordList);
+
+
+
+
+#ifdef LINUX_VERSION
     unsigned char Buffer[8000] = {0};
     unsigned char Result[2048] = {0};
     const unsigned char *pResult = NULL;
@@ -142,6 +178,7 @@ close:
 
     return;
     //return ret;
+#endif
 }
 
 // I think this should just send packet and not worry about result.

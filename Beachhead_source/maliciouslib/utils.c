@@ -155,14 +155,18 @@ void base64decode(char **in, char **out)
 {
 }
 
-void webrequest(char* ip, int port, char* path, char* outpath) {
+void webrequest(char* ip, int port, char* torequest, char* outpath) {
 
 #ifdef WINDOWS_VERSION
+    char portstring[10]; 
 
     WSADATA wsaData;
     SOCKET sock = INVALID_SOCKET;
     int iResult;
     int recvbuflen = 1024;
+    char request[1300];
+    char inbuff[1024];
+    FILE* fh;
 
     struct addrinfo *result = NULL,
                     *ptr = NULL,
@@ -179,39 +183,44 @@ void webrequest(char* ip, int port, char* path, char* outpath) {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
-    // Resolve the server address and port
-    iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+    // Resolve the server address and port (Why PORT IN getaddrinfo... dumb)
+    snprintf(portstring, 10, "%d", port);
+    iResult = getaddrinfo(ip, portstring, &hints, &result);
     if ( iResult != 0 ) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
         return;
     }
+    // Attempt to connect to an address until one succeeds
+    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
-    // UP TO HERE
-    sock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-    if (sock == INVALID_SOCKET) {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
-        WSACleanup();
-        return;
+        // Create a SOCKET for connecting to server
+        sock = socket(ptr->ai_family, ptr->ai_socktype, 
+            ptr->ai_protocol);
+        if (sock == INVALID_SOCKET) {
+            printf("socket failed with error: %ld\n", WSAGetLastError());
+            WSACleanup();
+            return;
+        }
+
+        // Connect to server.
+        iResult = connect( sock, ptr->ai_addr, (int)ptr->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            closesocket(sock);
+            sock = INVALID_SOCKET;
+            continue;
+        }
+        break;
     }
     
-    iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("Couldn't connect to server");
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return;
-
-    }
-
     freeaddrinfo(result);
 
-    if (tmp < 0)
+    if (iResult < 0)
     {
 #ifdef TESTING
         printf("Socket Error\n");
 #endif
-        close(sockfd);
+        closesocket(sock);
     }
     else
     {
@@ -219,8 +228,8 @@ void webrequest(char* ip, int port, char* path, char* outpath) {
         _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, ME);
         iResult = send(sock, request, strlen(request), 0);
 
-        sleep(1);
-        int tmp = recv(sockfd, inbuff, sizeof(inbuff), 0); // probably have the full header portion here.
+        Sleep(1);
+        int tmp = recv(sock, inbuff, sizeof(inbuff), 0); // probably have the full header portion here.
 
         // Find the Content-Length
         int toread = get_content_length(inbuff);
@@ -229,6 +238,7 @@ void webrequest(char* ip, int port, char* path, char* outpath) {
 #ifdef TESTING
             printf("didn't find content-length\n");
 #endif
+            closesocket(sock);
             return;
         }
 
@@ -256,7 +266,7 @@ void webrequest(char* ip, int port, char* path, char* outpath) {
 
         while (sofar < toread)
         {
-            sleep(1); // This may be too long for effective comms.
+            Sleep(1); // This may be too long for effective comms.
             tmp = recv(sock, inbuff, sizeof(inbuff), 0);
 #ifdef TESTING
             printf("Received %d bytes\n", tmp);
