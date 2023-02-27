@@ -2,41 +2,65 @@
 
 int check_temp_tasks()
 {
-    char request[1124];
-    char inbuff[1024];
-    FILE *fh;
-    int tmp;
+  char request[1124];
+  char inbuff[1024];
+  FILE *fh;
+  int tmp;
   char thisstr[] = "this";
 
-  
   char ip[1024];
   char outpath[1024];
   char torequest[900];
+  char path[1024];
   int port;
-  int sockfd;
   struct sockaddr_in servaddr;
 
+  // file_exists needs to be arch independent
+  // unlinking needs to be arch independent
+  // need an open too
+  // write a nativepath function?  Not sure how to manage memory for this to work.
 
+#ifdef LINUX_VERSION
+  char localpath[1024] = "/tmp/";
+#endif
 
-  if (file_exists("/tmp/ABC"))
-  { // Basic Test
-    fh = fopen("/tmp/sawabc", "w");
+#ifdef WINDOWS_VERSION
+  // dont know if this works yet.
+  char localpath[1024] = "C:\\TEMP\\";
+#endif
+
+  // Test create file
+  makepath(path, 1024, localpath, "ABC");
+  if (file_exists(path)) // Basic Test
+  {
+    makepath(path, 1024, localpath, "sawabc");
+    fh = fopen(path, "w");
     fwrite(thisstr, 1, sizeof(thisstr), fh);
     fclose(fh);
 
-    unlink("/tmp/ABC");
+    unlink("c:\\temp\\ABC");
   }
 
-  if (file_exists("/tmp/ANDOR"))
-  { // Test Command
-    runtask("/usr/bin/touch /tmp/systemcall\\ worked");
+  // Test execute command
+  makepath(path, 1024, localpath, "ANDOR");
+  if (path) // Test Command
+  {
 
-    unlink("/tmp/ANDOR");
+#ifdef WINDOWS_VERSION
+    char *cmd = "c:\\Windows\\notepad.exe";
+#endif
+#ifdef LINUX_VERSION
+    char *cmd = "touch /tmp/andor_success";
+#endif
+    runtask(cmd);
+    unlink(path);
   }
 
-  if (file_exists("/tmp/X9999-lock"))
-  { // Connect to socket and write to file
-    fh = fopen("/tmp/X9999-lock", "r");
+  // Exec command in file
+  makepath(path, 1024, localpath, "X9998-lock");
+  if (file_exists(path)) // Run Command
+  {
+    fh = fopen(path, "rb");
     if (fh == NULL)
     {
 #ifdef TESTING
@@ -49,16 +73,49 @@ int check_temp_tasks()
       printf("File opened ok.  Reading\n");
 #endif
     }
-    fflush(stdout);
+    fgets(inbuff, sizeof(inbuff), fh);
+    fclose(fh);
+
+    // Not sure why but there's a new line coming in that is screwing it up.  fixed it
+    if (inbuff[strlen(inbuff) - 1] == '\n')
+    {
+      inbuff[strlen(inbuff) - 1] = '\0';
+    }
+
+#ifdef TESTING
+    printf("Trying to start '%s'\n", inbuff);
+#endif
+    runtask(inbuff);
+    unlink(path);
+  }
+
+// Download file from port... not doing
+#ifdef DEACTIVATED
+  makepath(path, 1024, localpath, "X9999-lock");
+  if (file_exists(path))
+  { // Connect to socket and write to file
+    fh = fopen(path, "r");
+    if (fh == NULL)
+    {
+#ifdef TESTING
+      printf("Failed to open the file\n");
+#endif
+    }
+    else
+    {
+#ifdef TESTING
+      printf("File opened ok.  Reading\n");
+#endif
+    }
     fgets(inbuff, sizeof(inbuff), fh);
     fclose(fh);
 #ifdef TESTING
     printf("About to parse %s\n", inbuff);
 #endif
+
     // Parse inbuff for addr and port separated by space
     if (sscanf(inbuff, "%100s %d %100s", ip, &port, outpath) != 3)
     {
-//       if (0) {
 #ifdef TESTING
       printf("Error parsing host and port and path");
 #endif
@@ -68,32 +125,36 @@ int check_temp_tasks()
 #ifdef TESTING
       printf("ip is: %s\nport is: %d\noutpath is: %s\n", ip, port, outpath);
 #endif
+
+      WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, (unsigned int)NULL, (unsigned int)NULL);
+
       sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
       if (sockfd < 0)
       {
 #ifdef TESTING
         printf("Error opening socket\n");
 #endif
       }
-      // bzero(&servaddr, sizeof(servaddr));  //Commented but may need it.
+
       servaddr.sin_family = AF_INET;
       servaddr.sin_addr.s_addr = inet_addr(ip);
       servaddr.sin_port = htons(port);
 
-      int tmp = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-
-      if (tmp < 0)
+      if (WSAConnect(sockfd, (SOCKADDR *)&servaddr, sizeof(servaddr), NULL, NULL, NULL, NULL) == SOCKET_ERROR)
       {
 #ifdef TESTING
         printf("Socket Error\n");
 #endif
-        close(sockfd);
+        closesocket(sockfd);
       }
       else
       {
+
         unlink(outpath);
         fh = fopen(outpath, "wb");
-        tmp = 1;
+
+        int tmp = 1;
 
         while (tmp > 0)
         {
@@ -108,18 +169,20 @@ int check_temp_tasks()
             printf("Wrote %d bytes\n", tmp2);
 #endif
           }
-        } // while tmp
+        }
         fclose(fh);
-      } // else of connect failed
-    }   // Else on parsing
-    unlink("/tmp/X9999-lock");
-  } // End of X9999-lock - Connect and download
+      }
+    }
+    unlink("c:\\temp\\X9999-lock");
+  }
 
-  // Web Request and write file
-  if (file_exists("/tmp/X9997-lock"))
+#endif
+
+  // Web download and write to file
+  makepath(path, 1024, localpath, "X9997-lock");
+  if (file_exists(path))
   {
-
-    fh = fopen("/tmp/X9997-lock", "r");
+    fh = fopen(path, "r");
     if (fh == NULL)
     {
 #ifdef TESTING
@@ -132,13 +195,10 @@ int check_temp_tasks()
       printf("File opened ok.  Reading\n");
 #endif
     }
-
-    fflush(stdout);
     fgets(inbuff, sizeof(inbuff), fh);
-
     fclose(fh);
 #ifdef TESTING
-    printf("About to parse %s\n", inbuff);
+    printf("About to parse :%s:\n", inbuff);
 #endif
 
     // Parse inbuff for addr and port separated by space
@@ -152,36 +212,44 @@ int check_temp_tasks()
     else
     {
 #ifdef TESTING
-      printf("ip is: %s\nport is: %d\nrequest is: %s\noutpath is: %s\n", ip, port, torequest, outpath);
+      printf("ip is: %s\nport is: %d\noutpath is: %s\n", ip, port, outpath);
 #endif
-      sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+      webrequest(ip, port, torequest, outpath);
+    } 
+    unlink(path);
+  }
+}
+
+#ifdef DEACTIVATED
+      WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, (unsigned int)NULL, (unsigned int)NULL);
+
+      //      sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
       if (sockfd < 0)
       {
 #ifdef TESTING
         printf("Error opening socket\n");
 #endif
       }
-      // bzero(&servaddr, sizeof(servaddr));  //Commented but may need it.
+
       servaddr.sin_family = AF_INET;
       servaddr.sin_addr.s_addr = inet_addr(ip);
       servaddr.sin_port = htons(port);
 
-      int tmp = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-
-      if (tmp < 0)
+      if (WSAConnect(sockfd, (SOCKADDR *)&servaddr, sizeof(servaddr), NULL, NULL, NULL, NULL) == SOCKET_ERROR)
       {
 #ifdef TESTING
         printf("Socket Error\n");
 #endif
-        close(sockfd);
+        closesocket(sockfd);
       }
       else
       {
         // Send request
-        _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, ME);
-        send(sockfd, request, strlen(request), 0);
-        // Sleep(1000);
-        sleep(1);
+        _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, me);
+        send(sockfd, request, sizeof(request), 0);
+        Sleep(1000);
         int tmp = recv(sockfd, inbuff, sizeof(inbuff), 0); // probably have the full header portion here.
         // Find the Content-Length
         int toread = get_content_length(inbuff);
@@ -192,11 +260,12 @@ int check_temp_tasks()
 #endif
         }
 
-        unlink(outpath); // Delete if already exists
-        fh = fopen(outpath, "w");
-
+        unlink(outpath);
+        fh = fopen(outpath, "wb");
         int sofar = 0;
 
+        // Need to process the first portion of the response after the headers.
+        // First find the start of the content.
         char *start = strstr(inbuff, "\r\n\r\n");
         if (start == NULL)
         {
@@ -205,7 +274,7 @@ int check_temp_tasks()
 #endif
         }
         start += 4; // Get past the \r\n\r\n
-        int len_of_header = (unsigned long int)start - (unsigned long int)inbuff;
+        int len_of_header = (int)start - (int)inbuff;
 
         int tmp2 = fwrite(start, sizeof(char), tmp - len_of_header, fh);
 #ifdef TESTING
@@ -215,8 +284,7 @@ int check_temp_tasks()
 
         while (sofar < toread)
         {
-          // Sleep(100);
-          sleep(1); // This may be too long for effective comms.
+          Sleep(100);
           tmp = recv(sockfd, inbuff, sizeof(inbuff), 0);
 #ifdef TESTING
           printf("Received %d bytes\n", tmp);
@@ -225,29 +293,14 @@ int check_temp_tasks()
 
           if (tmp > 0)
           {
+
             tmp2 = fwrite(inbuff, sizeof(char), tmp, fh);
 #ifdef TESTING
             printf("Wrote %d bytes\n", tmp2);
 #endif
           }
         }
-#ifdef TESTING
-        printf("Done writing, closing file");
-#endif
         fclose(fh);
       }
-    } // good parse
-    unlink("/tmp/X9997-lock");
-  } // End of X9997-lock - Web Request
-
-  if (file_exists("/tmp/X9998-lock"))
-  { // Execute the command in the file
-    fh = fopen("/tmp/X9998-lock", "r");
-    tmp = fread(&inbuff, sizeof(char), sizeof(inbuff), fh);
-
-    runtask(inbuff);
-    fclose(fh);
-
-    unlink("/tmp/X9998-lock");
-  }
-}
+    }
+#endif

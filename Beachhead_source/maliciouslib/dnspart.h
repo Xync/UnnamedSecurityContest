@@ -1,9 +1,13 @@
 #include <stdio.h>
-#include <netdb.h>
 #include <unistd.h>
 #include <string.h>
+
+
+#ifdef LINUX_VERSION
+#include <netdb.h>
 #include <arpa/inet.h>
 #include <resolv.h>
+#endif
 
 extern char* ME;
 

@@ -11,10 +11,14 @@ typedef struct taskstruct {
     int done;
 } taskstruct;
 
+#define SUNDAY 0
+#define MONDAY 1
+#define TUESDAY 2
 #define WEDNESDAY 3
 #define THURSDAY 4
 #define FRIDAY 5
 #define SATURDAY 6
+
 
 
 

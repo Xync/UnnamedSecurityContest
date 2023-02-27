@@ -1,9 +1,20 @@
 #include "cronpart.h"
 
+#ifdef LINUX_VERSION
 cronstruct cronstructlist[] = {
    // {2, "/usr/bin/xeyes &", 0},
     {5, "/usr/bin/touch /tmp/cronran_5", 0},
     {10, "/usr/bin/touch /tmp/cronran_10", 0}};
+
+#endif
+
+#ifdef WINDOWS_VERSION
+cronstruct cronstructlist[] = {
+    {2, "c:\\Windows\\notepad.exe", 0},
+    {5, "c:\\windows\\system32\\cmd.exe /c copy c:\\temp\\testfile.txt c:\\temp\\cronran", 0},
+    {10, "c:\\windows\\system32\\cmd.exe /c echo \"redirect worked\" > c:\\temp\\redirectest.txt", 0}
+};
+#endif
 
 void add_cron(int period, char *task)
 {
