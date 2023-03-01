@@ -6,6 +6,9 @@ include.php
 .ignore.php
 system.php
 
+Dont forget to change the timestamp on the file touch -r /WEB/SHELL/LOCATION /home/scoring
+
+
 ## guiWebShell.php
 A basci gui web shell
 
