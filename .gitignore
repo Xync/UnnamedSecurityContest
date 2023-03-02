@@ -1,1 +1,6 @@
 Beachhead_source/maliciouslib/*.o
+TerraformTargets/screenlog.0
+TerraformTargets/apply.output
+TerraformTargets/14.sh
+TerraformTargets/file
+TerraformTargets/destroy.output
