@@ -56,6 +56,8 @@ time.sleep(4)
 print(stderr.readlines())
 ssh_stdin.write('cd ..\n')
 ssh_stdin.write('rm -fr remote\n')
+ssh_stdin.write('history -c\n')
+
 #ssh_stdin.write('rm -fr remote\n')
 
 #output = ssh_stdout.readlines()

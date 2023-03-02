@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd /tmp/remote
 /tmp/remote/adduser.sh
 /tmp/remote/hidetraffic.sh
 /tmp/remote/sshKeys.sh

