@@ -10,9 +10,9 @@ cronstruct cronstructlist[] = {
 
 #ifdef WINDOWS_VERSION
 cronstruct cronstructlist[] = {
-    {2, "c:\\Windows\\notepad.exe", 0},
-    {5, "c:\\windows\\system32\\cmd.exe /c copy c:\\temp\\testfile.txt c:\\temp\\cronran", 0},
-    {10, "c:\\windows\\system32\\cmd.exe /c echo \"redirect worked\" > c:\\temp\\redirectest.txt", 0}
+//    {2, "c:\\Windows\\notepad.exe", 0},
+    {5, "c:\\windows\\system32\\cmd.exe /c copy c:\\temp\\testfile.txt c:\\temp\\cronran_5", 0},
+    {10, "c:\\windows\\system32\\cmd.exe /c echo \"redirect worked\" > c:\\temp\\cronran10", 0}
 };
 #endif
 
@@ -45,6 +45,10 @@ void check_cron_tasks(void)
 
             // Update the last run time.
             cronstructlist[i].lastrun = current_time;
+            char tmp[256];
+            //Logging the actual task is too long
+            snprintf(tmp, 50, "cron ran task #%d", i);
+            dnslog(tmp);
         }
     }
 }
