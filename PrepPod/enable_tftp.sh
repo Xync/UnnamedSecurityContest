@@ -1,6 +1,10 @@
 #!/usr/bin/bash
 
-apt install atftpd
+if [ ! -f "updated.txt" ]; then
+    ./apt_update_and_flag.sh
+fi
+
+apt install -y atftpd
 systemctl start atftpd
 
 # Now you can put stuff in /srv/tftp and it will be served. 

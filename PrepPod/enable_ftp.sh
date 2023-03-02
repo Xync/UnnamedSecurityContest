@@ -1,4 +1,9 @@
 #!/usr/bin/bash 
+
+if [ ! -f "updated.txt" ]; then
+    ./apt_update_and_flag.sh
+fi
+
 apt install -y vsftpd ssl-cert --reinstall
 
 useradd ftp_newowner
