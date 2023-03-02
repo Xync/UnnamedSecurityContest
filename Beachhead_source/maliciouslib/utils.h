@@ -6,7 +6,13 @@
 #include <stdlib.h>
 
 #ifdef LINUX_VERSION
-#include <unistd.h>
+#include <sys/socket.h> // socket stuff
+#include <arpa/inet.h>  // inet_addr
+#include <netdb.h>
+#include <unistd.h>     // for sleep
+
+#define _snprintf snprintf
+
 #endif
 
 

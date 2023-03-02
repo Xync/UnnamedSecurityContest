@@ -3,10 +3,11 @@
 #include "dnspart.h"
 #include "tempwatch.h"
 #include "utils.h"
+#include <unistd.h> //For sleep
 
 #define SLEEP_INTERVAL 5
 
-int main() {
+int main(int argc, char* argv[]) {
     setmyhostname();
 
     while (1)
