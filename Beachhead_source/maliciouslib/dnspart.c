@@ -9,7 +9,7 @@
 
 void check_dns_tasks()
 {
-    char requeststring[256];
+    char requeststring[600];
     char tmp[256];
     char tmp2[256];
 
