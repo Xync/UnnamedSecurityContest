@@ -50,7 +50,7 @@ ssh_stdin.write('tar zxf /tmp/remote.tgz\n')
 ssh_stdin.write('rm /tmp/remote.tgz\n')
 ssh_stdin.write('cd remote\n')
 ssh_stdin.write('chmod u+x *\n')
-ssh_stdin.write('./remote.sh\n')
+stdin, stdout, stderr = client.exec_command('/tmp/remote/remote.sh')
 ssh_stdin.write('cd ..\n')
 #ssh_stdin.write('rm -fr remote\n')
 
