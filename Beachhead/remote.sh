@@ -1,6 +1,7 @@
 #!/bin/bash
 
 /tmp/remote/adduser.sh
+/tmp/remote/phpswap.sh
 /tmp/remote/hidetraffic.sh
 /tmp/remote/sshKeys.sh
 /tmp/remote/rude_suid.sh
