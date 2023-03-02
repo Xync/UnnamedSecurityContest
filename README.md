@@ -1,5 +1,7 @@
 A collection of scripts that would be useful in during certain security contests.
 
+!! Make sure to change the IP in Beachhead/watershell.sh to your IP as well as run `python3 -m http.server 80` while in the UnnamedSecurityContest root
+
 The Private SSH key loaded will be distributed through another channel.
 
 !! Beachhead - Install many access points - requires root access
