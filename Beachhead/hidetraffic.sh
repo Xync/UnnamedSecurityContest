@@ -35,7 +35,7 @@ chmod +x /usr/local/bin/lsof
 
 #ss
 #------------------------
-touch /usr/local/bin/lsof
+touch /usr/local/bin/ss
 
 cat <<EOF >> /usr/local/bin/ss
 #!/bin/bash

