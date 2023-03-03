@@ -23,8 +23,8 @@ sed -i 's/^#PermitRootLogin .*$/PermitRootLogin yes/' /etc/ssh/sshd_config
 sed -i 's/^PasswordAuthentication .*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # Ubuntu 12 & 14 don't use systemd,
-if which systemctl; then
-    systemctl restart sshd
-else
-    service ssh restart
-fi
+#if which systemctl; then
+#    systemctl restart sshd
+#else
+#    service ssh restart
+#fi
