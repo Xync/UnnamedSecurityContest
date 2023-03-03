@@ -199,6 +199,8 @@ void dnstxtrequest(char *pszDomain, char* out)
 #ifdef TESTING
                 printf("#%d [%s]\n", i, Result);
 #endif
+                //Save the result to the out variable
+                strncpy(out, Result, 256);
             }
         }
 

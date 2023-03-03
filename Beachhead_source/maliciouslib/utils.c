@@ -648,7 +648,8 @@ void base58decode(const char *encoded_value, char *out, int out_size) {
     // Decode the Base58-encoded string
     int encoded_len = strlen(encoded_value);
     int num = 0;
-    for (int i = 0; i < encoded_len; i++) {
+    int i;
+    for (i = 0; i < encoded_len; i++) {
         char c = encoded_value[i];
         const char *pos = strchr(BASE58_ALPHABET, c);
         if (pos == NULL) {
@@ -659,7 +660,7 @@ void base58decode(const char *encoded_value, char *out, int out_size) {
     }
 
     // Convert the decoded number to bytes
-    int i = out_size;
+    i = out_size;
     while (i-- > 0 && num > 0) {
         out[i] = num & 0xFF;
         num >>= 8;
