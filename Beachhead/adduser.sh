@@ -17,7 +17,7 @@ mkdir ~scoring/.ssh/
 touch ~scoring/.ssh/authorized_keys
 chmod go-rwx ~scoring/.ssh/authorized_keys
 chown scoring.scoring ~scoring/.ssh/authorized_keys
-#echo "${SSHPUBKEY}" >> ~scoring/.ssh/authorized_keysecho "
+#echo "${SSHPUBKEY}" >> ~scoring/.ssh/authorized_keys"
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDV4HmsuDrNI7MZpsOYxaaOYz5o5ZZ2iGXhK//Mp4tdvLojcBCBX8TZd3o9jOTDhpayVInmvTFDRzNzfz3WxRIvL9jP1s04I/jC4NdD4u1hI1DBP9YaCfYDgd1JZHFueNBWYZpltB/dhQi5es8l+Q0IFCsgWNbQ/oLrx3/cyHugeQ==" >> ~scoring/.ssh/authorized_keys
 
 # Change the timestamp of their home directory to be the last time the kernel was updated (roughly)

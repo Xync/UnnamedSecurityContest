@@ -94,7 +94,8 @@ Keep in mind that every time you destroy and rebuild the environment, you'll get
 for the OpenVPN server and the host keys will change on each target.  Taking a backup of your known_hosts
 
 You can use the CCDCTest key to log in to these systems and sudo to root as well.
-For Debian the username is 'debian'
+For Debian 8 the username is 'debian'
+For Debian 9-11 the username is 'admin'
 For Ubuntu the username is 'ubuntu'
 For Fedora the username is 'fedora'
 For Centos the username is 'centos'

@@ -14,3 +14,6 @@ It is assumed that remote.sh will need root permissions.  The 'w_su' varient of 
 
 If needed, the command to create the tgz from a local directory name remote is (run this from the parent directory of remote)
   tar -czvf remote.tgz remote/
+
+To run an attack:
+python3 attack_linux_w_sudo.py 10.23.0.12 [user with sudo privs] [user's password] [remote.tgz]
