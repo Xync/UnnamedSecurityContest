@@ -11,6 +11,6 @@
 #endif
 
 int check_temp_tasks();
-extern char* ME;
+extern char ME[100];
 
 #define _snprintf snprintf

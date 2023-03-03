@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include "utils.h"
 
 #ifdef LINUX_VERSION
 #include <netdb.h>
@@ -12,12 +12,10 @@
 #ifdef WINDOWS_VERSION
 #include <Windows.h>
 #include <windns.h>
-#pragma comment(lib, "Dnsapi.lib") // link against the Dnsapi library
 #endif
 
 
-extern char* ME;
+extern char ME[100];
 
 void check_dns_tasks();
-void dnslog(int status);
-void dnstxtrequest(char *tofetch);
+void dnstxtrequest(char *tofetch, char *out);

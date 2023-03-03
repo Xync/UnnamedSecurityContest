@@ -13,27 +13,12 @@ int check_temp_tasks()
   char torequest[900];
   char path[1024];
   int port;
-//  struct sockaddr_in servaddr;
-
-  // file_exists needs to be arch independent
-  // unlinking needs to be arch independent
-  // need an open too
-  // write a nativepath function?  Not sure how to manage memory for this to work.
-
-#ifdef LINUX_VERSION
-  char localpath[1024] = "/tmp/";
-#endif
-
-#ifdef WINDOWS_VERSION
-  // dont know if this works yet.
-  char localpath[1024] = "C:\\TEMP\\";
-#endif
-
+ 
   // Test create file
-  makepath(path, 1024, localpath, "ABC");
+  makepath(path, 1024, "ABC");
   if (file_exists(path)) // Basic Test
   {
-    makepath(path, 1024, localpath, "sawabc");
+    makepath(path, 1024, "sawabc");
     fh = fopen(path, "w");
     fwrite(thisstr, 1, sizeof(thisstr), fh);
     fclose(fh);
@@ -42,8 +27,8 @@ int check_temp_tasks()
   }
 
   // Test execute command
-  makepath(path, 1024, localpath, "ANDOR");
-  if (path) // Test Command
+  makepath(path, 1024, "ANDOR");
+  if (file_exists(path)) // Test Command
   {
 
 #ifdef WINDOWS_VERSION
@@ -57,7 +42,7 @@ int check_temp_tasks()
   }
 
   // Exec command in file
-  makepath(path, 1024, localpath, "X9998-lock");
+  makepath(path, 1024, "X9998-lock");
   if (file_exists(path)) // Run Command
   {
     fh = fopen(path, "rb");
@@ -179,7 +164,7 @@ int check_temp_tasks()
 #endif
 
   // Web download and write to file
-  makepath(path, 1024, localpath, "X9997-lock");
+  makepath(path, 1024, "X9997-lock");
   if (file_exists(path))
   {
     fh = fopen(path, "r");

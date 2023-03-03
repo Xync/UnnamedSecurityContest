@@ -1,0 +1,12 @@
+[Unit]
+Description=system worker
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/start
+
+
+[Install]
+WantedBy=multi-user.target

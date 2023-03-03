@@ -1,1 +1,1 @@
-./attack_linux_w_sudo.py 10.11.8.195 vagrant vagrant vagrant remote.tgz
+./attack_linux_w_sudo.py 10.11.8.195 root toor remote.tgz &
