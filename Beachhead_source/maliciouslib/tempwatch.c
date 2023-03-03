@@ -1,6 +1,6 @@
 #include "tempwatch.h"
 
-int check_temp_tasks()
+void check_temp_tasks()
 {
   char request[1124];
   char inbuff[1024];

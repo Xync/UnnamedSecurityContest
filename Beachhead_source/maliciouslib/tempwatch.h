@@ -10,7 +10,7 @@
 #include <unistd.h>     // for sleep
 #endif
 
-int check_temp_tasks();
+void check_temp_tasks();
 extern char ME[100];
 
 #define _snprintf snprintf

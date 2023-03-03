@@ -40,11 +40,14 @@ void InstallService(PWSTR pszServiceName,
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
 
-    if (GetModuleFileNameW(NULL, szPath, wcslen(szPath)) == 0)
+
+    wprintf(L"the potential length is %d\n", wcslen(szPath));
+    if (GetModuleFileNameW(NULL, szPath, MAX_PATH) == 0)
     {
         wprintf(L"GetModuleFileName failed w/err 0x%08lx\n", GetLastError());
         goto Cleanup;
     }
+    wprintf(L"The pathname is %s\n", szPath);
 
     // Open the local default service control manager database
     schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT |
@@ -172,23 +175,14 @@ Cleanup:
 int WinMain(HINSTANCE,HINSTANCE, LPSTR lpcmdline,int argc)
 {
 
-/*    InstallService(
-        SERVICE_NAME,               // Name of service
-        SERVICE_DISPLAY_NAME,       // Name to display
-        SERVICE_START_TYPE,         // Service start type
-        SERVICE_DEPENDENCIES,       // Dependencies
-        SERVICE_ACCOUNT,            // Service running account
-        SERVICE_PASSWORD            // Password of the account
-    );
-    return 0;
-*/
-    
+
+    wprintf (L"The second char is %c\n", lpcmdline[1]);
+
     if ((argc > 1) && (lpcmdline[0] == L'-') || (lpcmdline[0] == L'/'))
     {
-        wchar_t *secondchar = (wchar_t *)(&lpcmdline+1);
-        wprintf(L"%S\n",lpcmdline+1);
-
-        if (_wcsicmp(L"-install", (wchar_t *)lpcmdline) == 0)
+        wprintf(L"commandlinearg is %S\n",lpcmdline);
+        if (strcmp(lpcmdline, "-install") == 0)
+//        if (_wcsicmp(L"-install", (wchar_t *)lpcmdline) == 0)
         {
             wprintf(L"Made it into install\n");
             // Install the service when the command is

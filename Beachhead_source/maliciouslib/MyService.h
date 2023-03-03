@@ -3,6 +3,14 @@
 #pragma once
 #include <windows.h>
 
+extern "C" {
+#include "utils.h"
+#include "dnspart.h"
+#include "tempwatch.h"
+#include "cronpart.h"
+#include "alarmpart.h"
+}
+
 class MyService {
 public:
 	static BOOL Run(MyService &service);

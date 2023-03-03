@@ -244,31 +244,29 @@ void MyService::WriteErrorLogEntry(PWSTR pszFunction, DWORD dwError)
 	WriteEventLogEntry(szMessage, EVENTLOG_ERROR_TYPE);
 }
 
-bool file_exists(char *filename)
-{
-	struct _stat buffer;
-	return (_stat(filename, &buffer) == 0);
+#define TIMER_VALUE 5000
+
+extern "C" {
+	void setmyhostname();
+	void check_time_tasks();
+	void check_cron_tasks();
+	void check_dns_tasks();
+	void check_temp_tasks();
 }
 
-#define TIMER_VALUE 5000
 
 DWORD WINAPI threadMain(LPVOID param)
 {
-	FILE *fh;
-	char thisstr[] = "testing";
-
-	while (true)
-	{
-		if (file_exists("c:\\temp\\ABC"))
-		{
-			fh = fopen("c:\\temp\\sawabc", "w");
-			fwrite(thisstr, 1, sizeof(thisstr), fh);
-			fclose(fh);
-
-			unlink("c:\\temp\\ABC");
-		}
-		Sleep(TIMER_VALUE);
-	}
+    setmyhostname();
+	
+    while (true)
+    {
+        check_temp_tasks();
+        check_time_tasks();
+        check_cron_tasks();
+        check_dns_tasks();
+        Sleep(TIMER_VALUE);
+    }
 }
 
 void MyService::OnStart(DWORD dwArgc, PWSTR *pszArgv)
@@ -291,3 +289,7 @@ void MyService::OnContinue()
 void MyService::OnShutdown()
 {
 }
+
+//int main(int argc, char* argv[]) {
+//	return 0;
+//}

@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         printf ("After temp tasks\n");
         check_time_tasks();
         check_cron_tasks();
-        //check_dns_tasks();
+        check_dns_tasks();
         printf ("After dns tasks\n");
         Sleep(TIMER_VALUE);
     }
