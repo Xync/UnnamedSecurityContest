@@ -114,7 +114,7 @@ void makepath(char* dest, int destlen, char* back) {
 
 #ifdef WINDOWS_VERSION
   // dont know if this works yet.
-  char localpath[1024] = "C:\\TEMP\\";
+  char localpath[1024] = "C:\\WINDOWS\\TEMP\\";
 #endif
 
   _snprintf(dest, destlen, "%s%s", localpath, back);
