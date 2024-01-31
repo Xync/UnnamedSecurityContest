@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -g -I. -fPIC -D TESTING -D LINUX_VERSION -lpthread -lresolv -lutil
+CFLAGS= -g -I. -fPIC -D TESTING -D LINUX_VERSION -lpthread -lresolv -lutil -pthread
 DEPS = cronpart.h alarmpart.h dnspart.h tempwatch.h library.h utils.h
 
 all: linux_maliciouslib.so linux_standalone 

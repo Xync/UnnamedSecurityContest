@@ -6,7 +6,7 @@ cronstruct cronstructlist[] = {
     {5, "/usr/bin/touch /tmp/cronran_5", 0},
     {10, "/usr/bin/touch /tmp/cronran_10", 0}};
 
-#endif
+#endif 
 
 #ifdef WINDOWS_VERSION
 cronstruct cronstructlist[] = {

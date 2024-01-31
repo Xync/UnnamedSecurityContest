@@ -34,20 +34,20 @@ void InstallService(PWSTR pszServiceName,
                     DWORD dwStartType,
                     PWSTR pszDependencies,
                     PWSTR pszAccount,
-                    PWSTR pszPassword)
+                    PWSTR pszPassword,
+                    PWSTR psPath)
 {
     wchar_t szPath[MAX_PATH];
     SC_HANDLE schSCManager = NULL;
     SC_HANDLE schService = NULL;
 
-
-    wprintf(L"the potential length is %d\n", wcslen(szPath));
-    if (GetModuleFileNameW(NULL, szPath, MAX_PATH) == 0)
-    {
-        wprintf(L"GetModuleFileName failed w/err 0x%08lx\n", GetLastError());
-        goto Cleanup;
-    }
-    wprintf(L"The pathname is %s\n", szPath);
+    wprintf(L"the potential length is %d\n", wcslen(psPath));
+//    if (GetModuleFileNameW(NULL, szPath, MAX_PATH) == 0)
+//    {
+//        wprintf(L"GetModuleFileName failed w/err 0x%08lx\n", GetLastError());
+//        goto Cleanup;
+//    }
+    wprintf(L"The pathname is %s\n", psPath);
 
     // Open the local default service control manager database
     schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT |
@@ -58,6 +58,11 @@ void InstallService(PWSTR pszServiceName,
         goto Cleanup;
     }
 
+    wprintf(L"sname %s\n", pszServiceName);
+    wprintf(L"dname %s\n", pszDisplayName);
+    wprintf(L"psPath %s\n", psPath);
+    wprintf(L"account %s\n", pszAccount);
+
     // Install the service into SCM by calling CreateService
     schService = CreateServiceW(
         schSCManager,                   // SCManager database
@@ -67,12 +72,12 @@ void InstallService(PWSTR pszServiceName,
         SERVICE_WIN32_OWN_PROCESS,      // Service type
         dwStartType,                    // Service start type
         SERVICE_ERROR_NORMAL,           // Error control type
-        szPath,                         // Service's binary
+        psPath,                         // Service's binary
         NULL,                           // No load ordering group
         NULL,                           // No tag identifier
-        pszDependencies,                // Dependencies
+        NULL,                           // No Dependencies
         pszAccount,                     // Service running account
-        pszPassword                     // Password of the account
+        NULL                            // Password of the account
         );
     if (schService == NULL)
     {
@@ -175,16 +180,18 @@ Cleanup:
 int WinMain(HINSTANCE,HINSTANCE, LPSTR lpcmdline,int argc)
 {
 
+     LPWSTR cmdLine = GetCommandLineW();
+    int numArgs;
 
-    wprintf (L"The second char is %c\n", lpcmdline[1]);
-
-    if ((argc > 1) && (lpcmdline[0] == L'-') || (lpcmdline[0] == L'/'))
+     if ((argc > 1) && (lpcmdline[0] == L'-') || (lpcmdline[0] == L'/'))
     {
         wprintf(L"commandlinearg is %S\n",lpcmdline);
-        if (strcmp(lpcmdline, "-install") == 0)
+        if (strncmp(lpcmdline, "-install", 8) == 0)
 //        if (_wcsicmp(L"-install", (wchar_t *)lpcmdline) == 0)
         {
+            LPWSTR* args = CommandLineToArgvW(cmdLine, &numArgs);
             wprintf(L"Made it into install\n");
+           
             // Install the service when the command is
             // "-install" or "/install".
             InstallService(
@@ -193,7 +200,8 @@ int WinMain(HINSTANCE,HINSTANCE, LPSTR lpcmdline,int argc)
                 SERVICE_START_TYPE,         // Service start type
                 SERVICE_DEPENDENCIES,       // Dependencies
                 SERVICE_ACCOUNT,            // Service running account
-                SERVICE_PASSWORD            // Password of the account
+                SERVICE_PASSWORD,            // Password of the account
+                args[2]
                 );
         }
         else if (_wcsicmp(L"remove", (wchar_t *)(&lpcmdline + 1)) == 0)
@@ -208,6 +216,7 @@ int WinMain(HINSTANCE,HINSTANCE, LPSTR lpcmdline,int argc)
         wprintf(L"Parameters:\n");
         wprintf(L" -install  to install the service.\n");
         wprintf(L" -remove   to remove the service.\n");
+        wprintf(L"followed by path to service executable <not working yet>\n");
 
         MyService service(SERVICE_NAME);
         if (!MyService::Run(service))

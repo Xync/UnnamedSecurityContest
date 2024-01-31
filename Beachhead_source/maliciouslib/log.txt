@@ -1,0 +1,22 @@
+
+Parts:
+
+Alarm - Schedule hardcoded in it.  When right day comes it runs things.
+Cronpart - Runs things on regular basis.
+dnspart - bases64 command from dns.
+
+Need to remember how to get service to work.
+
+
+This crap is not easy.... 
+ServiceBase Class - 
+https://learn.microsoft.com/en-us/dotnet/api/system.serviceprocess.servicebase?view=dotnet-plat-ext-8.0
+
+
+
+Installing
+sc create "My Sample Service" binPath= C:\SampleService.exe
+
+Looking:
+sc query type= service
+sc query type= service | grep -i display (in cygwin)

@@ -290,6 +290,9 @@ void MyService::OnShutdown()
 {
 }
 
-//int main(int argc, char* argv[]) {
-//	return 0;
-//}
+//g++ won't compile without the main function.  Not sure if sc will start at right place.
+
+
+	int main(int argc, char* argv[]) {
+	return 0;
+}
